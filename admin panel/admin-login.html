@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — Garden of Memories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<!-- Link to main and login specific stylesheets -->
+<link rel="stylesheet" href="../visitors panel/visitors css/style.css">
+<link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+<div class="login-container">
+  <div class="login-box">
+    <a href="../visitors panel/index.html" class="login-logo">
+      <img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
+    </a>
+    <h1 class="login-title">Admin Panel</h1>
+    <p class="login-sub">Please enter your credentials to access the dashboard.</p>
+
+    <!-- The form action will redirect to the dashboard. In a real app, this would be handled by a server. -->
+    <form class="contact-form" action="admin.html" style="padding:0; border:none; box-shadow:none; background:transparent; margin-top: 2.5rem;">
+      <div class="field-group">
+        <label class="field-label">Email Address</label>
+        <input class="field-input" type="email" value="admin@gardenofmemories.com" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input class="field-input" type="password" value="password" required>
+      </div>
+      <button type="submit" class="submit-btn" style="width: 100%; margin-top: 1rem;">Log In</button>
+    </form>
+
+    <div class="login-footer">
+      <a href="../visitors panel/index.html">← Back to Main Site</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

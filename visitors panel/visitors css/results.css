@@ -1,0 +1,106 @@
+/* ─── RESULTS PAGE ─── */
+.page-header {
+  padding-bottom: 1.5rem;
+}
+
+.results-container {
+  max-width: 750px;
+  margin: 0 auto;
+  padding: 2rem 3rem 4rem;
+  min-height: 50vh;
+}
+
+.results-summary {
+  font-size: 1rem;
+  color: var(--charcoal);
+  text-align: center;
+  margin-top: 0.5rem;
+}
+.results-summary strong {
+  color: var(--sage-dark);
+  font-weight: 500;
+}
+
+.privacy-protected-page,
+.privacy-protected-page .result-card,
+.privacy-protected-page .results-summary {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.result-card {
+  background: var(--ivory);
+  border: 1px solid rgba(139,168,142,0.2);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s;
+}
+.result-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  border-color: var(--sage);
+}
+
+.result-info .name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--deep);
+  margin-bottom: 0.25rem;
+}
+.result-info .details {
+  font-size: 0.8rem;
+  color: var(--stone);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.result-info .details span {
+  display: inline-block;
+  white-space: nowrap;
+}
+.result-info .details strong {
+  color: var(--sage-dark);
+  font-weight: 500;
+}
+
+.private-detail {
+  transition: filter 1s ease, opacity 1s ease;
+}
+
+.private-detail.is-blurred {
+  filter: blur(6px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Make search results responsive on smaller screens */
+@media (max-width: 680px) {
+  .result-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+  }
+}
+
+@media print {
+  body.privacy-protected-page * {
+    visibility: hidden !important;
+  }
+
+  body.privacy-protected-page::before {
+    content: "Printing search results is disabled for privacy.";
+    visibility: visible;
+    display: block;
+    padding: 2rem;
+    color: #111;
+    font: 16px Arial, sans-serif;
+  }
+}

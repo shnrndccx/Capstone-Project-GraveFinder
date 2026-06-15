@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Garden of Memories — Grave Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="visitors css/style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo" style="text-decoration: none;">
+    <img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
+    <div class="nav-brand-text">
+      <span class="brand-main">Garden of Memories Memorial Park and Chapels</span>
+      <span class="brand-sub">Grave Finder</span>
+    </div>
+  </a>
+  <div class="nav-menu-container">
+    <button class="hamburger-btn" onclick="toggleMenu()" aria-label="Toggle Menu">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--deep)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    <div class="nav-dropdown" id="navDropdown">
+      <button class="dropdown-item" onclick="openModal('faq-modal'); toggleMenu()">FAQs</button>
+      <button class="dropdown-item" onclick="openModal('guidelines-modal'); toggleMenu()">Guidelines</button>
+      <div class="dropdown-divider"></div>
+      <a href="../admin panel/admin-login.html" class="dropdown-item">Admin Login</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <video class="hero-video" autoplay loop muted playsinline>
+    <!-- video file -->
+    <source src="../assets/gommp.mp4" type="video/mp4">
+  </video>
+  <div class="hero-bg"></div>
+  <div class="particles" id="particles"></div>
+  <h1 class="hero-title">
+    A Place of <em>Eternal Rest</em>
+  </h1>
+  <p class="hero-sub">
+    A trusted sanctuary where families find comfort, peace, and
+    a dignified place to honor those they love.
+  </p>
+
+  <!-- Search -->
+  <form action="results.html" method="GET" class="search-box" onsubmit="validateSearchForm(event)">
+    <div class="field-group">
+      <label class="field-label">First Name</label>
+      <input class="field-input" type="text" name="firstName" placeholder="e.g. Maria">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Middle Name</label>
+      <input class="field-input" type="text" name="middleName" placeholder="e.g. Corpuz">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Last Name</label>
+      <input class="field-input" type="text" name="lastName" placeholder="e.g. Santos">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Relationship</label>
+      <select class="field-select" name="relationship" id="relationship-select">
+        <option disabled selected>Select...</option>
+        <option>Spouse</option>
+        <option>Parent</option>
+        <option>Child</option>
+        <option>Sibling</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field-group" id="other-relationship-group" style="display: none;">
+      <label class="field-label">Specify Relationship</label>
+      <input class="field-input" type="text" name="otherRelationship" placeholder="e.g. Friend">
+    </div>
+    <button type="submit" class="search-btn">Locate Loved One →</button>
+  </form>
+
+  <p class="hero-hours"><strong>Park Hours:</strong> 6:00 AM - 6:00 PM Daily &nbsp;|&nbsp; <strong>Office:</strong> 8:00 AM - 5:00 PM</p>
+</div>
+
+<!-- MISSION -->
+<div class="split-section">
+  <div class="reveal">
+    <p class="section-tag">Our Mission</p>
+    <h2 class="section-title">Caring for <em>Families</em><br>Through Every Season</h2>
+    <div class="gold-bar"></div>
+    <p class="section-body">
+      Garden of Memories Memorial Park and Chapels Inc. is committed to providing quality memorial services that give comfort and support to families during difficult times. The organization aims to maintain a peaceful and well-managed memorial park where visitors can honor and remember their loved ones with dignity and respect.
+    </p>
+    <button class="learn-btn" onclick="openModal('mission-modal')">Learn More →</button>
+  </div>
+
+  <div class="visual-card reveal reveal-delay-1">
+    <!-- Replace 'assets/your-image.jpg' with the actual path/name of your picture -->
+    <div class="visual-card-inner" style="background: linear-gradient(rgba(44, 53, 45, 0.3), rgba(44, 53, 45, 0.3)), url('../assets/main office.jpg') center/cover no-repeat;">
+      <!-- Botanical SVG -->
+      <svg class="botanical" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#8ba88e" stroke-width="0.8">
+        <path d="M100 180 C100 180 60 140 60 100 C60 70 78 50 100 50 C122 50 140 70 140 100 C140 140 100 180 100 180Z"/>
+        <path d="M100 50 C100 50 80 30 80 15"/>
+        <path d="M100 50 C100 50 120 30 120 15"/>
+        <circle cx="100" cy="180" r="2" fill="#8ba88e"/>
+      </svg>
+
+      <div class="floating-stat stat-1">
+        <div class="floating-stat-num">45+</div>
+        <div class="floating-stat-label">Years of Service</div>
+      </div>
+      <div class="floating-stat stat-2">
+        <div class="floating-stat-num">1978</div>
+        <div class="floating-stat-label">Established</div>
+      </div>
+
+      <!-- Decorative dots grid -->
+      <div class="dots-decor" style="position:absolute; bottom:2rem; right:2rem;">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VISION -->
+<div class="split-section">
+  <!-- Placed visual first for natural left-right alternation without messy RTL code hacks -->
+  <div class="visual-card reveal reveal-delay-1">
+    <!-- Replace 'assets/vision-image.jpg' with the actual path/name of your picture -->
+    <div class="visual-card-inner" style="background: linear-gradient(rgba(44, 53, 45, 0.3), rgba(44, 53, 45, 0.3)), url('../assets/office.jpg') center/cover no-repeat;">
+      <svg viewBox="0 0 200 200" style="width:160px;opacity:0.12;" fill="none" stroke="#c4a661" stroke-width="0.7">
+        <circle cx="100" cy="100" r="70"/>
+        <circle cx="100" cy="100" r="50"/>
+        <circle cx="100" cy="100" r="30"/>
+        <line x1="100" y1="30" x2="100" y2="170"/>
+        <line x1="30" y1="100" x2="170" y2="100"/>
+      </svg>
+      <div class="floating-stat" style="bottom:2rem;right:1.5rem;">
+        <div class="floating-stat-num">No. 1</div>
+        <div class="floating-stat-label">Recognized Memorial Park</div>
+      </div>
+    </div>
+  </div>
+  <div class="reveal">
+    <p class="section-tag">Our Vision</p>
+    <h2 class="section-title">A Trusted <em>Landmark</em><br>for the Community</h2>
+    <div class="gold-bar"></div>
+    <p class="section-body">
+      Garden of Memories envisions becoming a trusted memorial park that continuously improves its services and facilities to meet the needs of the community. We aim to provide a respectful, serene environment where families can preserve cherished memories and pay tribute to their loved ones in eternal peace.
+    </p>
+    <button class="learn-btn" onclick="openModal('vision-modal')">Learn More →</button>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="history-section">
+  <div class="history-inner">
+    <div class="reveal">
+      <p class="section-tag">Our History</p>
+      <h2 class="section-title" style="font-size:2.4rem;">Rooted in<br><em>Legacy</em></h2>
+    </div>
+    <div class="reveal reveal-delay-1">
+      <div class="gold-bar"></div>
+      <p class="section-body">
+        Garden of Memories Memorial Park was established in 1978 to offer a well-maintained, dignified, and peaceful resting place for departed loved ones. Over the years, the park has continuously improved its serene landscapes, chapel facilities, and compassionate funeral services — blossoming into a comforting sanctuary for families to visit and remember those they hold dear.
+      </p>
+      <button class="learn-btn" onclick="openModal('history-modal')">Read Our History →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="mission-modal" class="modal-overlay" onclick="closeModal(event, 'mission-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'mission-modal')">✕</button>
+    <p class="section-tag" style="justify-content:flex-start;">Our Mission</p>
+    <h2 class="section-title" style="margin-top:0; font-size: 2.2rem;">Caring for <em>Families</em></h2>
+    <div class="gold-bar"></div>
+    <div class="mission-points-container">
+      <div class="mission-point">
+        <div class="icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+        </div>
+        <div>
+          <h3>Compassionate Support</h3>
+          <p>Providing quality memorial services that give comfort and support to families during their most difficult times.</p>
+        </div>
+      </div>
+      <div class="mission-point">
+        <div class="icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>
+        </div>
+        <div>
+          <h3>Serene Environment</h3>
+          <p>Maintaining a peaceful and well-managed memorial park where visitors can honor their loved ones with dignity and respect.</p>
+        </div>
+      </div>
+      <div class="mission-point">
+        <div class="icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </div>
+        <div>
+          <h3>Dedicated Service</h3>
+          <p>Our staff is available around the clock, ensuring every detail is handled with the utmost care so you can focus on remembrance.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="vision-modal" class="modal-overlay" onclick="closeModal(event, 'vision-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'vision-modal')">✕</button>
+    <p class="section-tag" style="justify-content:flex-start;">Our Vision</p>
+    <h2 class="section-title" style="margin-top:0; font-size: 2.2rem;">A Trusted <em>Landmark</em></h2>
+    <div class="gold-bar"></div>
+    <div class="mission-points-container">
+      <div class="mission-point">
+        <div class="icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.63l-1.95-3.38a.5.5 0 0 0-.63-.25l-2.4 1a7.41 7.41 0 0 0-1.65-.91l-.38-2.65a.5.5 0 0 0-.5-.46h-3.9a.5.5 0 0 0-.5.46l-.38 2.65a7.41 7.41 0 0 0-1.65.91l-2.4-1a.5.5 0 0 0-.63.25l-1.95 3.38a.5.5 0 0 0 .12.63l2.03 1.58c-.04.3-.06.61-.06.94s.02.64.06.94l-2.03 1.58a.5.5 0 0 0-.12.63l1.95 3.38a.5.5 0 0 0 .63.25l2.4-1a7.41 7.41 0 0 0 1.65.91l.38 2.65a.5.5 0 0 0 .5.46h3.9a.5.5 0 0 0 .5-.46l.38-2.65a7.41 7.41 0 0 0 1.65-.91l2.4 1a.5.5 0 0 0 .63-.25l1.95-3.38a.5.5 0 0 0-.12-.63l-2.03-1.58z"></path><circle cx="12" cy="12" r="3.5"></circle></svg>
+        </div>
+        <div>
+          <h3>Continuous Improvement</h3>
+          <p>To continuously improve our services and facilities, meeting the evolving needs of the community with excellence.</p>
+        </div>
+      </div>
+      <div class="mission-point">
+        <div class="icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.83 11.17a4 4 0 0 0-5.66-5.66l-7.07 7.07a4 4 0 0 0 5.66 5.66l7.07-7.07z"></path><path d="M12.5 12.5L4 4"></path></svg>
+        </div>
+        <div>
+          <h3>Respectful Sanctuaries</h3>
+          <p>To provide a respectful and serene environment where families can preserve cherished memories and pay tribute to their loved ones.</p>
+        </div>
+      </div>
+      <div class="mission-point">
+        <div class="icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
+        <div>
+          <h3>Future Commitment</h3>
+          <p>To look toward the future with a commitment to sustainability and community support, ensuring our grounds remain a beautiful sanctuary for generations.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="history-modal" class="modal-overlay" onclick="closeModal(event, 'history-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'history-modal')">✕</button>
+    <p class="section-tag" style="justify-content:flex-start;">Our History</p>
+    <h2 class="section-title" style="margin-top:0; font-size: 2.2rem;">Rooted in <em>Legacy</em></h2>
+    <div class="gold-bar"></div>
+    <div class="section-body" style="font-size: 0.9rem; line-height: 1.9;">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-year">1978</div>
+          <div class="timeline-content">
+            <h3>The Beginning</h3>
+            <p>TAPAT Park Developers, Inc. was formally organized, registered with the SEC, and began commercial operations as Garden of Memories Memorial Park. Drawn by the vision of Engr. Tomas Sanchez, Jr., the project was backed by prominent investors from Taguig and Pateros. Despite facing a major flood from two typhoons in its first year, the company's resolve was strengthened, leading to the decision to raise the entire park to a higher level.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">1981</div>
+          <div class="timeline-content">
+            <h3>A Landmark Rises</h3>
+            <p>A new chapel-office building was constructed in the middle of the park, which turned out to be the country’s biggest at the time—another first for Garden of Memories.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">1993</div>
+          <div class="timeline-content">
+            <h3>Expanding Services</h3>
+            <p>After fifteen years of success, the company ventured into pre-need services, establishing The Garden of Memories Memorial Life Plan Inc. to educate the public on the importance of planning for the inevitable.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">1994</div>
+          <div class="timeline-content">
+            <h3>A Union of Companies</h3>
+            <p>The stockholders approved the merger of TAPAT Park Developers Inc. and Garden of Memories Life Plan Inc., creating the new entity: Garden of Memories Memorial Park and Life Plan Inc. (GMMPLPI). This led to the construction of what was lauded as the country’s most elegant memorial chapel and mortuary complex.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2003</div>
+          <div class="timeline-content">
+            <h3>A Tradition of Caring</h3>
+            <p>Celebrating its 25th anniversary, the company upheld its integrity by voluntarily surrendering its license to sell pre-need plans, protecting its name amidst industry-wide scandals.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2011</div>
+          <div class="timeline-content">
+            <h3>Commitment to Excellence</h3>
+            <p>Major renovations were undertaken to upgrade park facilities, including the construction of new comfort rooms, reinforcing the company's commitment to visitor convenience and safety.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2018</div>
+          <div class="timeline-content">
+            <h3>Precious as Ruby</h3>
+            <p>Celebrating its 40th Anniversary, GMMPCI embarked on the construction of a new Columbarium and Chapel Complex to meet the modern challenges of the community, continuing its legacy of innovation and service.</p>
+            <img src="../assets/helpdesk.jpg" alt="Columbarium and Chapel Complex" style="width: 100%; border-radius: 4px; margin-top: 1rem; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+          </div>
+        </div>
+      </div>
+
+      <div class="dropdown-divider" style="margin: 2.5rem 0;"></div>
+
+      <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--deep); margin-bottom: 0.5rem;">INCORPORATORS</h3>
+      <p style="font-size: 0.8rem; color: var(--stone); margin-bottom: 1.5rem;">TAPAT Park Developers, Inc. was registered with SEC on March 6, 1978.</p>
+      <div class="incorporator-grid">
+        <div class="incorporator-card">
+          <img src="../assets/incorporators/TOMAS S. SANCHEZ JR.png" alt="TOMAS S. SANCHEZ JR." class="incorporator-img">
+          <p class="incorporator-name">TOMAS S. SANCHEZ JR.</p>
+        </div>
+        <div class="incorporator-card">
+          <img src="../assets/incorporators/francisco f. tangco.png" alt="FRANCISCO F. TANGCO" class="incorporator-img">
+          <p class="incorporator-name">FRANCISCO F. TANGCO</p>
+        </div>
+        <div class="incorporator-card">
+          <img src="../assets/incorporators/marcelino c. rayos del sol.png" alt="MARCELINO C. RAYOS DEL SOL" class="incorporator-img">
+          <p class="incorporator-name">MARCELINO C. RAYOS DEL SOL</p>
+        </div>
+        <div class="incorporator-card">
+          <img src="../assets/incorporators/trinidad c. rayos del sol.png" alt="TRINIDAD C. RAYOS DEL SOL" class="incorporator-img">
+          <p class="incorporator-name">TRINIDAD C. RAYOS DEL SOL</p>
+        </div>
+        <div class="incorporator-card">
+          <img src="../assets/incorporators/ester t. sta ana.png" alt="ESTER T. STA ANA" class="incorporator-img">
+          <p class="incorporator-name">ESTER T. STA ANA</p>
+        </div>
+        <div class="incorporator-card">
+          <img src="../assets/incorporators/patricina c. mariano.png" alt="PATROCINA C. MARIANO" class="incorporator-img">
+          <p class="incorporator-name">PATROCINA C. MARIANO</p>
+        </div>
+        <div class="incorporator-card">
+          <img src="../assets/incorporators/nora salonga.png" alt="NORA SALONGA" class="incorporator-img">
+          <p class="incorporator-name">NORA SALONGA</p>
+        </div>
+        <div class="incorporator-card">
+          <img src="../assets/incorporators/jose e. reyes.png" alt="JOSE E. REYES" class="incorporator-img">
+          <p class="incorporator-name">JOSE E. REYES</p>
+        </div>
+        <div class="incorporator-card">
+          <img src="../assets/incorporators/rolando g. luna.png" alt="ROLANDO G. LUNA" class="incorporator-img">
+          <p class="incorporator-name">ROLANDO G. LUNA</p>
+        </div>
+        <div class="incorporator-card">
+          <img src="../assets/incorporators/rodelito t. reyes.png" alt="RODELIO T. REYES" class="incorporator-img">
+          <p class="incorporator-name">RODELIO T. REYES</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="faq-modal" class="modal-overlay" onclick="closeModal(event, 'faq-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'faq-modal')">✕</button>
+    <p class="section-tag" style="justify-content:flex-start;">Got questions?</p>
+    <h2 class="section-title" style="margin-top:0; font-size: 2.2rem;">Frequently Asked <em>Questions</em></h2>
+    <div class="gold-bar"></div>
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div>
+        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--deep); margin-bottom: 0.3rem;">What are the park hours?</h3>
+        <p class="section-body" style="margin-bottom:0;">The memorial park is open daily from 6:00 AM to 6:00 PM. Our main office is open from 8:00 AM to 5:00 PM.</p>
+      </div>
+      <div>
+        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--deep); margin-bottom: 0.3rem;">How do I locate a loved one?</h3>
+        <p class="section-body" style="margin-bottom:0;">You can use the search tool on our homepage. Enter the name and relationship to view the exact location and map instructions.</p>
+      </div>
+      <div>
+        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--deep); margin-bottom: 0.3rem;">Do I need an appointment?</h3>
+        <p class="section-body" style="margin-bottom:0;">While walk-ins are welcome, we recommend scheduling an appointment to ensure a counselor is available to assist you with memorial services or inquiries.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="guidelines-modal" class="modal-overlay" onclick="closeModal(event, 'guidelines-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 800px;">
+    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'guidelines-modal')">✕</button>
+    <p class="section-tag" style="justify-content:flex-start;">Rules & Regulations</p>
+    <h2 class="section-title" style="margin-top:0; font-size: 2.2rem;">Visitor <em>Guidelines</em></h2>
+    <div class="gold-bar"></div>
+    
+    <div style="color: var(--charcoal); font-size: 0.9rem; line-height: 1.8;">
+      <h3 style="color: var(--deep); font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; margin-bottom: 0.5rem;">All Saints’ Day Celebration - Important Reminders</h3>
+      <p>To remember with fondness the heroes and saints of our lives and for an orderly, peaceful celebration of All Saints’ / Souls’ Day, please be reminded of the following. We like to enjoin everyone’s support and cooperation:</p>
+      
+      <ol style="padding-left: 1.5rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem;">
+        <li>On October 31 and November 1 starting at 6:00 a.m., Bagong Calzada will be one-way traffic going to Pasig (northbound). Vehicles from Pasig going to Garden of Memories will pass through M. Almeda St. (2-way traffic), left to Tomas Ave., left to Bagong Calzada.</li>
+        <li>Main gate will be used for ENTRY of vehicles from October 31 – November 1. EXIT of vehicles will be at Greenville Gate, towards Pateros proper or Taguig. All vehicles and pedestrians entering the Park will be subject to security check for safety purposes. Please note that parking space is limited inside the Park.</li>
+        <li><strong>MAIN GATE WILL BE CLOSED FOR ENTRY OF VEHICLES ON NOVEMBER 1 FROM 12:00 NN TO 8:00 P.M.</strong></li>
+        <li>Pedestrian’s Entry and Exit:
+          <ul style="padding-left: 1.5rem; list-style-type: disc; margin-top: 0.3rem;">
+            <li>Main Gate and Greenville Gate - October 31 (6:00 a.m. to 10:00 p.m.)</li>
+            <li>Main Gate - November 1 (6:00 a.m. to 12:00 m.n.)</li>
+            <li>Gate at Court of St. Lazarus – Nov. 1 (6:00 a.m. onwards)</li>
+            <li>Greenville Gate – November 1 (6:00 a.m. to 10:00 p.m.)</li>
+          </ul>
+        </li>
+        <li>All pedestrians and their belongings will be subject to security frisking upon entry.</li>
+        <li>Tents and its accessories should not encroach other people’s property (gravesite). The Park is not responsible for loss or damage of tents installed and left unattended. All tents must be removed on or before November 4 from 6:00 a.m. to 7:00 p.m. Otherwise, Park personnel will remove the tents for safekeeping. Applicable storage fees will apply and will be released only upon proper identification.</li>
+        <li>Please give courtesy to other people’s graves by not covering their flat markers (lapida).</li>
+        <li>The following items are <strong>NOT ALLOWED</strong> to be brought inside the Park which may disturb the solemnity of the occasion:
+          <ul style="padding-left: 1.5rem; list-style-type: disc; margin-top: 0.3rem; margin-bottom: 1rem;">
+            <li>Liquor and other intoxicating drinks</li>
+            <li>Household appliances and gadgets (even battery operated); generators</li>
+            <li>Bicycles, motorcycles, hoppers, pedicabs, scooters, rollerblades, e-bike and the like</li>
+            <li>Pets</li>
+          </ul>
+          <strong>STRICTLY PROHIBITED:</strong> Violators will be apprehended and/or turned over to Police authorities:
+          <ul style="padding-left: 1.5rem; list-style-type: disc; margin-top: 0.3rem;">
+            <li>Prohibited drugs</li>
+            <li>Firearms, knives and other deadly weapons – these should be turned over to the Security Guard and PNP personnel on duty during inspection and to be claimed upon getting out. Otherwise, these will be confiscated and the one caught possessing any of these items may be investigated and turned-over to police;</li>
+            <li>Any form of gambling</li>
+            <li>Drinking of liquor and other intoxicating drinks</li>
+            <li>Ambulant vendors</li>
+            <li>Lighting candles and/or candle dripping, flowers from other tombs or graves</li>
+            <li>Double parking and parking at unauthorized areas (any vehicle can be towed or issued citation tickets by traffic enforcers)</li>
+            <li>Cooking/grilling on gravesites</li>
+            <li>Solicitation of any kind</li>
+            <li>Boisterous laughter, loud noise</li>
+            <li>Putting of fences, straws, ropes or any temporary markings at gravesites as this prevents people to move easily. These will be removed by our Park personnel.</li>
+            <li>Fire cracker, Fireworks and the likes</li>
+            <li>Violation of other Park Rules and Regulations</li>
+          </ul>
+        </li>
+        <li>Garden of Memories supports the government regulation on smoking. Please smoke at the designated smoking areas.</li>
+        <li><strong>HOLY MASS SCHEDULES</strong> at Park Chapel: November 1 – 10:00 A.M. and 4:00 P.M.</li>
+        <li>Volunteers from the Philippine National Red Cross and Fil-Chinese Organization will be stationed on October 31 and November 1 at Park Chapel grounds to administer First Aid when needed.</li>
+        <li>If possible <strong>OBSERVE SOCIAL DISTANCING</strong>.</li>
+        <li>Please take care of your children and your personal belongings. The Park will not be responsible for any loss or damaged items brought inside the Park.</li>
+        <li>Report to us immediately (at Main Building / Police) any suspicious looking persons or bags left indiscriminately.</li>
+        <li>Please dispose garbage properly. Garbage collectors will be on hand to collect your garbage.</li>
+        <li>One-Way Traffic Flow inside the Park will be effected from October 31 & November 1.</li>
+        <li>To all senior citizens who will visit their gravesite, always bring your maintenance medicine and to all babies’ parents bring their allergy medicine for their protection. Handicapped persons/seniors are advised to visit their gravesite on October 31 & November 2.</li>
+      </ol>
+      
+      <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(139,168,142,0.3); font-size: 0.85rem; text-align: center;">
+        <p style="margin-bottom: 0.2rem; color: var(--deep);"><strong>GARDEN OF MEMORIES MEMORIAL PARK & CHAPELS, INC.</strong></p>
+        <p style="margin-bottom: 0.2rem;">Bagong Calzada, Pateros, MM</p>
+        <p style="margin-bottom: 0.2rem;">Tel. Nos. 86426181 to 82; 86425234 to 35; 09605152162</p>
+        <p>Email: <a href="mailto:gmmc@yahoo.com" style="color: var(--sage-dark); text-decoration: none;">gmmc@yahoo.com</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- System Message Modal -->
+<div id="system-message-modal" class="modal-overlay" onclick="closeModal(event, 'system-message-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()" style="text-align: center; max-width: 450px;">
+    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'system-message-modal')">✕</button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="var(--sage-dark)" stroke-width="2" style="width: 48px; height: 48px; margin-bottom: 1rem; margin-top: 1rem;">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <h2 class="section-title" style="margin-top:0; font-size: 2rem;">Notification</h2>
+    <p class="section-body" id="system-message-text" style="margin-bottom: 1.5rem;"></p>
+    <button class="search-btn" style="margin: 0 auto; display: inline-block; align-self: auto;" onclick="closeModal(event, 'system-message-modal')">Okay</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-bottom">
+    <span>© 2025 Garden of Memories Memorial Park & Chapels Inc.</span>
+    <span>All rights reserved.</span>
+  </div>
+</footer>
+
+<script src="visitors javascripts/script.js"></script>
+<script>
+  function toggleMenu() {
+    document.getElementById('navDropdown').classList.toggle('active');
+  }
+
+  // Close the dropdown if the user clicks outside of it
+  window.addEventListener('click', function(e) {
+    const container = document.querySelector('.nav-menu-container');
+    const dropdown = document.getElementById('navDropdown');
+    if (container && dropdown && !container.contains(e.target)) {
+      dropdown.classList.remove('active');
+    }
+  });
+
+  function validateSearchForm(event) {
+    const firstName = document.querySelector('input[name="firstName"]').value.trim();
+    const middleName = document.querySelector('input[name="middleName"]').value.trim();
+    const lastName = document.querySelector('input[name="lastName"]').value.trim();
+
+    if (firstName === '' && middleName === '' && lastName === '') {
+      event.preventDefault(); // Stop form submission
+      // Use the existing system message modal to show an error
+      document.getElementById('system-message-text').innerText = 'Please fill in at least one name field (First Name, Middle Name, or Last Name) to search.';
+      openModal('system-message-modal');
+    }
+  }
+</script>
+</body>
+</html>

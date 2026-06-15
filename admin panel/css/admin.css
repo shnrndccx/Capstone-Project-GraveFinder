@@ -1,0 +1,198 @@
+/* ─── ADMIN DASHBOARD ─── */
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+  padding-top: 75px; /* Account for fixed nav */
+  background: var(--bg-color);
+}
+
+/* Sidebar */
+.admin-sidebar {
+  width: 260px;
+  background: var(--ivory);
+  border-right: 1px solid rgba(139,168,142,0.2);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: fixed;
+  top: 75px;
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.sidebar-menu {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-menu a {
+  display: block;
+  padding: 0.8rem 1rem;
+  color: var(--charcoal);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.sidebar-menu a:hover,
+.sidebar-menu a.active {
+  background: var(--cream);
+  color: var(--sage-dark);
+  border-left: 3px solid var(--sage-dark);
+}
+
+/* Main Content */
+.admin-content {
+  flex: 1;
+  margin-left: 260px; /* Account for fixed sidebar */
+  padding: 3rem;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+}
+
+/* Stat Cards */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: var(--ivory);
+  border: 1px solid rgba(196,166,97,0.3);
+  padding: 1.5rem;
+  border-radius: 4px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+  border-top: 3px solid var(--gold);
+}
+
+.stat-card h3 {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--stone);
+  margin-bottom: 0.5rem;
+}
+
+.stat-card .stat-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;
+  color: var(--deep);
+  line-height: 1;
+}
+
+/* Data Tables */
+.admin-table-container {
+  background: var(--ivory);
+  border: 1px solid rgba(139,168,142,0.2);
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table th {
+  background: var(--cream);
+  padding: 1rem 1.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--sage-dark);
+  border-bottom: 1px solid rgba(139,168,142,0.2);
+}
+
+.admin-table td {
+  padding: 1rem 1.5rem;
+  font-size: 0.85rem;
+  color: var(--charcoal);
+  border-bottom: 1px solid rgba(139,168,142,0.1);
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tr:hover td {
+  background: rgba(139,168,142,0.05);
+}
+
+/* Action Buttons inside table */
+.action-btn {
+  background: transparent;
+  border: none;
+  color: var(--sage-dark);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
+.action-btn.delete {
+  color: #a35d5d;
+}
+.action-btn:hover {
+  text-decoration: underline;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+.status-confirmed {
+  background: #d4edda;
+  color: #155724;
+}
+.status-new {
+  background: #cce5ff;
+  color: #004085;
+}
+.status-read {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+/* Settings Grid */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+.settings-card {
+  background: var(--ivory);
+  padding: 2.5rem;
+  border: 1px solid rgba(139,168,142,0.2);
+  border-radius: 4px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+}
+.settings-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  color: var(--deep);
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(196,166,97,0.3);
+  padding-bottom: 0.75rem;
+}
