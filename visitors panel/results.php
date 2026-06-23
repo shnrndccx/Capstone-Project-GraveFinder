@@ -91,6 +91,25 @@ if(mysqli_num_rows($result) > 0){
                     ?>
                 </span>
             </div>
+
+            <div class="details" style="display:flex; flex-direction:column; gap:0.3rem;">
+    <span>Born: <?php echo date("F j, Y", strtotime($row['birth_date'])); ?></span>
+    <span>Died: <?php echo date("F j, Y", strtotime($row['death_date'])); ?></span>
+
+    <span>
+        📍 <?php echo $row['location']; ?><br>
+        Section <?php echo $row['section']; ?>
+        • Block <?php echo $row['block']; ?>
+        • Lot <?php echo $row['lot_no']; ?>
+        • Phase <?php echo $row['phase']; ?>
+    </span>
+</div>
+
+<div style="margin-top:15px;">
+    <a href="map.php" class="nav-cta">
+        View on Cemetery Map
+    </a>
+</div>
         </div>
     </div>
 
