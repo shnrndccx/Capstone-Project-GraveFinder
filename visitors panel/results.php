@@ -1,3 +1,20 @@
+<?php
+
+include 'db_connect.php';
+
+$firstName = $_GET['firstName'] ?? '';
+$middleName = $_GET['middleName'] ?? '';
+$lastName = $_GET['lastName'] ?? '';
+
+$sql = "SELECT * FROM deceased
+        WHERE first_name LIKE '%$firstName%'
+        AND middle_name LIKE '%$middleName%'
+        AND last_name LIKE '%$lastName%'";
+
+$result = mysqli_query($conn, $sql);
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,7 +46,12 @@
 
 <header class="page-header">
   <h1 class="page-title">Search <em>Results</em></h1>
-  <p id="search-query-display" class="results-summary">Loading results...</p>
+  <p class="results-summary">
+Showing results for:
+<?php
+echo htmlspecialchars(trim($firstName . ' ' . $middleName . ' ' . $lastName));
+?>
+</p>
   <button class="nav-cta" style="margin-top: 0.5rem; background: transparent;" onclick="openModal('filter-modal')">
     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 0.3rem;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filter Results
   </button>
@@ -45,7 +67,40 @@
 </header>
 
 <main class="results-container" id="results-list" style="max-width: 1280px; margin: 2rem auto; padding: 0 2rem;">
-  <!-- JavaScript will dynamically inject the search results here -->
+
+<?php
+if(mysqli_num_rows($result) > 0){
+
+    while($row = mysqli_fetch_assoc($result)){
+?>
+    <div class="result-card">
+        <div class="result-info">
+            <h2>
+                <?php echo $row['first_name'].' '.$row['middle_name'].' '.$row['last_name']; ?>
+            </h2>
+
+            <div class="details" style="display:flex; flex-direction:column; gap:0.3rem;">
+                <span>Born: <?php echo $row['birth_date']; ?></span>
+                <span>Died: <?php echo $row['death_date']; ?></span>
+                <span>
+                    Location:
+                    <?php
+                    echo $row['location'] .
+                         ' | Section ' . $row['section'] .
+                         ' | Lot ' . $row['lot_no'];
+                    ?>
+                </span>
+            </div>
+        </div>
+    </div>
+
+<?php
+    }
+}else{
+    echo "<p>No matching records found.</p>";
+}
+?>
+
 </main>
 
 <!-- Template for Dynamic Result Cards -->
@@ -117,8 +172,7 @@
   </div>
 </div>
 
-<!-- Linking to the standalone JS file -->
-<script src="visitors javascripts/results.js"></script>
+<!-- <script src="visitors javascripts/results.js"></script> -->
 <script src="visitors javascripts/script.js"></script>
 </body>
 </html>

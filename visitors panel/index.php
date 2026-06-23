@@ -52,7 +52,7 @@
   </p>
 
   <!-- Search -->
-  <form action="results.html" method="GET" class="search-box" onsubmit="validateSearchForm(event)">
+  <form action="results.php" method="GET" class="search-box" onsubmit="validateSearchForm(event)">
     <div class="field-group">
       <label class="field-label">First Name</label>
       <input class="field-input" type="text" name="firstName" placeholder="e.g. Maria">
