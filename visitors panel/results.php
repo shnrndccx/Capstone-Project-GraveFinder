@@ -6,10 +6,19 @@ $firstName = $_GET['firstName'] ?? '';
 $middleName = $_GET['middleName'] ?? '';
 $lastName = $_GET['lastName'] ?? '';
 
-$sql = "SELECT * FROM deceased
-        WHERE first_name LIKE '%$firstName%'
-        AND middle_name LIKE '%$middleName%'
-        AND last_name LIKE '%$lastName%'";
+$sql = "SELECT * FROM deceased WHERE 1=1";
+
+if (!empty($firstName)) {
+    $sql .= " AND first_name LIKE '%$firstName%'";
+}
+
+if (!empty($middleName)) {
+    $sql .= " AND middle_name LIKE '%$middleName%'";
+}
+
+if (!empty($lastName)) {
+    $sql .= " AND last_name LIKE '%$lastName%'";
+}
 
 $result = mysqli_query($conn, $sql);
 
@@ -34,14 +43,14 @@ $result = mysqli_query($conn, $sql);
 
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="nav-logo" style="text-decoration: none;">
+  <a href="index.php" class="nav-logo" style="text-decoration: none;">
     <img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
     <div class="nav-brand-text">
       <span class="brand-main">Garden of Memories Memorial Park and Chapels</span>
       <span class="brand-sub">Grave Finder</span>
     </div>
   </a>
-  <a href="index.html" class="nav-cta" style="text-decoration: none;">Back to Home</a>
+  <a href="index.php" class="nav-cta" style="text-decoration: none;">Back to Home</a>
 </nav>
 
 <header class="page-header">
