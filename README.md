@@ -49,6 +49,21 @@ These guidelines are intended to protect the current initial design and prevent 
 
 ---
 
+## 📖 Team Documentation
+
+**Important:** Please read the following documentation before starting development:
+
+1. **[QUICK_START.md](QUICK_START.md)** (2 min) - Get started immediately
+2. **[CROSS_PLATFORM_GUIDE.md](CROSS_PLATFORM_GUIDE.md)** (15 min) - Setup & troubleshooting
+3. **[DEVELOPMENT.md](DEVELOPMENT.md)** (20 min) - Development guidelines
+4. **[BROWSER_COMPATIBILITY.md](BROWSER_COMPATIBILITY.md)** (10 min) - Testing reference
+
+**Additional Resources:**
+- [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) - Overview of cross-platform setup
+- [RECOMMENDATIONS.md](RECOMMENDATIONS.md) - Future improvements roadmap
+
+---
+
 ## System Features
 
 ### Visitor Panel
@@ -116,16 +131,6 @@ The system is currently in the **initial development stage**. The project team w
 
 ---
 
-## Developers
-
-GraveFinder is developed by:
-
-* **Sheena C. Arnado**
-* **Riztie U. Calipay**
-* **Nicole F. Capilitan**
-* **Luis Cali D. Ravasco**
-
----
 
 ## Final Developer Reminder
 

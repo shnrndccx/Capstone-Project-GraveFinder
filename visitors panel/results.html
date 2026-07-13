@@ -1,29 +1,3 @@
-<?php
-
-include 'db_connect.php';
-
-$firstName = $_GET['firstName'] ?? '';
-$middleName = $_GET['middleName'] ?? '';
-$lastName = $_GET['lastName'] ?? '';
-
-$sql = "SELECT * FROM deceased WHERE 1=1";
-
-if (!empty($firstName)) {
-    $sql .= " AND first_name LIKE '%$firstName%'";
-}
-
-if (!empty($middleName)) {
-    $sql .= " AND middle_name LIKE '%$middleName%'";
-}
-
-if (!empty($lastName)) {
-    $sql .= " AND last_name LIKE '%$lastName%'";
-}
-
-$result = mysqli_query($conn, $sql);
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,7 +7,7 @@ $result = mysqli_query($conn, $sql);
 <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
 <title>Search Results — Garden of Memories</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <!-- Link to the main stylesheet -->
 <link rel="stylesheet" href="visitors css/style.css">
 <!-- Link to the results-specific stylesheet -->
@@ -43,92 +17,35 @@ $result = mysqli_query($conn, $sql);
 
 <!-- NAV -->
 <nav>
-  <a href="index.php" class="nav-logo" style="text-decoration: none;">
+  <a href="index.html" class="nav-logo" style="text-decoration: none;">
     <img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
     <div class="nav-brand-text">
       <span class="brand-main">Garden of Memories Memorial Park and Chapels</span>
       <span class="brand-sub">Grave Finder</span>
     </div>
   </a>
-  <a href="index.php" class="nav-cta" style="text-decoration: none;">Back to Home</a>
+  <a href="index.html" class="nav-cta" style="text-decoration: none;">Back to Home</a>
 </nav>
 
 <header class="page-header">
   <h1 class="page-title">Search <em>Results</em></h1>
-  <p class="results-summary">
-Showing results for:
-<?php
-echo htmlspecialchars(trim($firstName . ' ' . $middleName . ' ' . $lastName));
-?>
-</p>
+  <p id="search-query-display" class="results-summary">Loading results...</p>
   <button class="nav-cta" style="margin-top: 0.5rem; background: transparent;" onclick="openModal('filter-modal')">
     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 0.3rem;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filter Results
   </button>
   
-  <div style="margin-top: 1rem; display: flex; justify-content: center;">
+  <div id="privacy-notice-panel" style="margin-top: 1rem; display: flex; justify-content: center;">
     <div style="display: inline-flex; align-items: center; gap: 0.6rem; background: rgba(196,166,97,0.1); border: 1px solid rgba(196,166,97,0.4); padding: 0.6rem 1.2rem; border-radius: 4px; font-size: 0.85rem; color: var(--charcoal);">
       <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--gold)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
       </svg>
-      <span id="privacy-notice-text"><strong>Privacy Notice:</strong> Personal details will be blurred in 45 seconds.</span>
+      <span id="privacy-notice-text"><strong>Privacy Notice:</strong> Personal details will be blurred in 15 seconds.</span>
     </div>
   </div>
 </header>
 
 <main class="results-container" id="results-list" style="max-width: 1280px; margin: 2rem auto; padding: 0 2rem;">
-
-<?php
-if(mysqli_num_rows($result) > 0){
-
-    while($row = mysqli_fetch_assoc($result)){
-?>
-    <div class="result-card">
-        <div class="result-info">
-            <h2>
-                <?php echo $row['first_name'].' '.$row['middle_name'].' '.$row['last_name']; ?>
-            </h2>
-
-            <div class="details" style="display:flex; flex-direction:column; gap:0.3rem;">
-                <span>Born: <?php echo $row['birth_date']; ?></span>
-                <span>Died: <?php echo $row['death_date']; ?></span>
-                <span>
-                    Location:
-                    <?php
-                    echo $row['location'] .
-                         ' | Section ' . $row['section'] .
-                         ' | Lot ' . $row['lot_no'];
-                    ?>
-                </span>
-            </div>
-
-            <div class="details" style="display:flex; flex-direction:column; gap:0.3rem;">
-    <span>Born: <?php echo date("F j, Y", strtotime($row['birth_date'])); ?></span>
-    <span>Died: <?php echo date("F j, Y", strtotime($row['death_date'])); ?></span>
-
-    <span>
-        📍 <?php echo $row['location']; ?><br>
-        Section <?php echo $row['section']; ?>
-        • Block <?php echo $row['block']; ?>
-        • Lot <?php echo $row['lot_no']; ?>
-        • Phase <?php echo $row['phase']; ?>
-    </span>
-</div>
-
-<div style="margin-top:15px;">
-    <a href="map.php" class="nav-cta">
-        View on Cemetery Map
-    </a>
-</div>
-        </div>
-    </div>
-
-<?php
-    }
-}else{
-    echo "<p>No matching records found.</p>";
-}
-?>
-
+  <!-- JavaScript will dynamically inject the search results here -->
 </main>
 
 <!-- Template for Dynamic Result Cards -->
@@ -142,8 +59,34 @@ if(mysqli_num_rows($result) > 0){
         <span class="location-detail"></span>
       </div>
     </div>
+    <button type="button" class="locate-btn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12A7 7 0 1 0 5 9c0 5.8 7 12 7 12Z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
+      Locate a Loved One
+    </button>
   </div>
 </template>
+
+<!-- Cemetery map -->
+<div id="map-modal" class="map-overlay" aria-hidden="true">
+  <section class="map-dialog" role="dialog" aria-modal="true" aria-labelledby="map-person-name">
+    <div class="map-toolbar">
+      <div>
+        <span class="map-eyebrow">Cemetery map</span>
+        <h2 id="map-person-name">Locate a Loved One</h2>
+        <p id="map-location-label"></p>
+      </div>
+      <button type="button" id="map-close" class="map-close" aria-label="Close map">&times;</button>
+    </div>
+    <div id="cemetery-map" class="cemetery-map">
+      <div class="map-loading">Loading cemetery map…</div>
+    </div>
+    <div class="map-footer">
+      <span><i class="legend-building"></i> Building / structure</span>
+      <span><i class="legend-pin"></i> Selected location</span>
+      <span class="map-tip">Drag to pan · Scroll or use buttons to zoom</span>
+    </div>
+  </section>
+</div>
 
 <footer>
   <div class="footer-bottom">
@@ -159,7 +102,7 @@ if(mysqli_num_rows($result) > 0){
     <h2 class="section-title" style="margin-top:0; font-size: 2.2rem;">Filter <em>Results</em></h2>
     <div class="gold-bar"></div>
     
-    <form class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;" onsubmit="event.preventDefault(); document.getElementById('system-message-text').innerText = 'Filters applied!'; closeModal(event, 'filter-modal'); openModal('system-message-modal');">
+    <form class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;" onsubmit="event.preventDefault(); document.getElementById('page-message-box').textContent = 'Filters applied successfully.'; document.getElementById('page-message-box').classList.add('is-visible'); closeModal(event, 'filter-modal');">
       <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
         <div class="field-group" style="flex: 1;">
           <label class="field-label">Section</label>
@@ -187,20 +130,8 @@ if(mysqli_num_rows($result) > 0){
   </div>
 </div>
 
-<!-- System Message Modal -->
-<div id="system-message-modal" class="modal-overlay" onclick="closeModal(event, 'system-message-modal')">
-  <div class="modal-content" onclick="event.stopPropagation()" style="text-align: center; max-width: 450px;">
-    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'system-message-modal')">✕</button>
-    <svg viewBox="0 0 24 24" fill="none" stroke="var(--sage-dark)" stroke-width="2" style="width: 48px; height: 48px; margin-bottom: 1rem; margin-top: 1rem;">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
-    </svg>
-    <h2 class="section-title" style="margin-top:0; font-size: 2rem;">Notification</h2>
-    <p class="section-body" id="system-message-text" style="margin-bottom: 1.5rem;"></p>
-    <button class="search-btn" style="margin: 0 auto; display: inline-block; align-self: auto;" onclick="closeModal(event, 'system-message-modal')">Okay</button>
-  </div>
-</div>
-
-<!-- <script src="visitors javascripts/results.js"></script> -->
+<!-- Linking to the standalone JS file -->
+<script src="visitors javascripts/results.js"></script>
 <script src="visitors javascripts/script.js"></script>
 </body>
 </html>

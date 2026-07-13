@@ -33,10 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Grab the URL parameters sent by the index.html form
   const params = new URLSearchParams(window.location.search);
   const firstName = params.get('firstName') || '';
+  const middleName = params.get('middleName') || '';
   const lastName = params.get('lastName') || '';
+  const deathYear = params.get('deathYear') || '';
   
   // Combine names, trim extra spaces, and handle empty search
-  let searchName = [firstName, lastName].join(' ').trim();
+  let searchName = [firstName, middleName, lastName].join(' ').replace(/\s+/g, ' ').trim();
   if (!searchName) {
     searchName = "Unknown";
   }
@@ -108,24 +110,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Filter the data based on search query
   let filteredData = dummyData;
-  if (firstName || lastName) {
+  if (firstName || middleName || lastName || deathYear) {
     filteredData = dummyData.filter(person => {
       const pName = person.name.toLowerCase();
       const matchFirst = firstName ? pName.includes(firstName.toLowerCase()) : true;
+      const matchMiddle = middleName ? pName.includes(middleName.toLowerCase()) : true;
       const matchLast = lastName ? pName.includes(lastName.toLowerCase()) : true;
-      return matchFirst && matchLast;
+      const matchDeathYear = deathYear ? person.died.includes(deathYear) : true;
+      return matchFirst && matchMiddle && matchLast && matchDeathYear;
     });
   }
 
   // 4. Inject the dummy data into the HTML
   const resultsList = document.getElementById('results-list');
   const template = document.getElementById('result-card-template');
+  const privacyPanel = document.getElementById('privacy-notice-panel');
   
   resultsList.innerHTML = '';
+  if (privacyPanel) {
+    privacyPanel.style.display = 'none';
+  }
 
   if (filteredData.length === 0) {
-    resultsList.innerHTML = '<p style="text-align: center; color: var(--stone); margin-top: 2rem; width: 100%;">No matching records found. Please try adjusting your search.</p>';
+    resultsList.innerHTML = `
+      <section class="no-results-panel">
+        <div class="no-results-illustration" aria-hidden="true">
+          <svg viewBox="0 0 80 80" width="96" height="96" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="34" cy="34" r="18" opacity="0.3" />
+            <path d="M46 46l18 18" />
+            <path d="M25 25h18" />
+            <path d="M25 34h10" />
+            <path d="M25 43h6" />
+          </svg>
+        </div>
+        <div class="no-results-copy">
+          <h2>No matching records found.</h2>
+          <p>It looks like the name might be misspelled, or it may not yet be entered in our system. Please go to our office or <a href="tel:+63286426181">call us</a> for help.</p>
+          <div class="search-tips">
+            <strong>Search tips</strong>
+            <ul>
+              <li>Try alternate spelling or omit common prefixes.</li>
+              <li>Use only the last name for a broader match.</li>
+              <li>Check the spelling of the name before searching again.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    `;
   } else {
+    if (privacyPanel) {
+      privacyPanel.style.display = 'flex';
+    }
     filteredData.forEach(person => {
       const clone = template.content.cloneNode(true);
       
@@ -134,27 +169,79 @@ document.addEventListener('DOMContentLoaded', () => {
       clone.querySelector('.born-detail').textContent = `Born: ${person.born}`;
       clone.querySelector('.died-detail').textContent = `Died: ${person.died}`;
       clone.querySelector('.location-detail').textContent = `Location: ${person.location}`;
+      clone.querySelector('.locate-btn').addEventListener('click', () => openCemeteryMap(person));
       
       resultsList.appendChild(clone);
     });
   }
 
   // Timer Notification Countdown
-  let timeLeft = 45;
+  let timeLeft = 15;
   const noticeText = document.getElementById('privacy-notice-text');
+  if (noticeText) {
+    noticeText.innerHTML = `<strong>Privacy Notice:</strong> For the privacy of families, personal details will be blurred after ${timeLeft} seconds.`;
+  }
   
   const countdown = setInterval(() => {
     timeLeft--;
     if (noticeText && timeLeft > 0) {
-      noticeText.innerHTML = `<strong>Privacy Notice:</strong> Personal details will be blurred in ${timeLeft} seconds.`;
+      noticeText.innerHTML = `<strong>Privacy Notice:</strong> For the privacy of families, personal details will be blurred after ${timeLeft} seconds.`;
     } else if (timeLeft <= 0) {
       clearInterval(countdown);
-      if (noticeText) noticeText.innerHTML = `<strong>Privacy Notice:</strong> Personal details are now blurred for privacy.`;
+      if (noticeText) noticeText.innerHTML = `<strong>Privacy Notice:</strong> Details are now blurred for family privacy.`;
     }
   }, 1000);
 
-  // Timer: Blur the details after 45 seconds (45000 milliseconds)
+  // Timer: Blur the details after 15 seconds (15000 milliseconds)
   setTimeout(() => {
     blurPrivateDetails();
-  }, 45000);
+  }, 15000);
+
+  const mapModal = document.getElementById('map-modal');
+  const mapHost = document.getElementById('cemetery-map');
+  let mapDataPromise;
+
+  function openCemeteryMap(person) {
+    document.getElementById('map-person-name').textContent = person.name;
+    document.getElementById('map-location-label').textContent = person.location;
+    mapModal.classList.add('is-open');
+    mapModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    mapDataPromise ||= Promise.all([
+      fetch('../assets/map-data/buildings.geojson').then(r => { if (!r.ok) throw Error('Map unavailable'); return r.json(); }),
+      fetch('../assets/map-data/frame.geojson').then(r => r.json())
+    ]);
+    mapDataPromise.then(([buildings, frame]) => renderMap(buildings, frame, person)).catch(() => {
+      mapHost.innerHTML = '<div class="map-loading">The map could not be loaded. Please run the site through a local web server.</div>';
+    });
+  }
+
+  function closeCemeteryMap() { mapModal.classList.remove('is-open'); mapModal.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
+  document.getElementById('map-close').addEventListener('click', closeCemeteryMap);
+  mapModal.addEventListener('click', e => { if (e.target === mapModal) closeCemeteryMap(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCemeteryMap(); });
+
+  function renderMap(buildings, frame, person) {
+    const all = [...buildings.features, ...frame.features];
+    const points = [];
+    const walk = value => Array.isArray(value?.[0]) ? value.forEach(walk) : points.push(value);
+    all.forEach(f => walk(f.geometry.coordinates));
+    const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
+    const bounds = { minX:Math.min(...xs), maxX:Math.max(...xs), minY:Math.min(...ys), maxY:Math.max(...ys) };
+    const pad = 12, width=bounds.maxX-bounds.minX+pad*2, height=bounds.maxY-bounds.minY+pad*2;
+    const pathFor = coords => { const rings=[]; const ringWalk = a => Array.isArray(a?.[0]?.[0]) ? a.forEach(ringWalk) : rings.push(a); ringWalk(coords); return rings.map(r => r.map((p,i) => `${i?'L':'M'}${p[0]-bounds.minX+pad},${bounds.maxY-p[1]+pad}`).join(' ')+' Z').join(' '); };
+    const hash=[...person.location].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,7);
+    const candidates=buildings.features.filter(f=>f.geometry.coordinates);
+    const target=candidates[hash%candidates.length]; const tp=[]; const collect=a=>Array.isArray(a?.[0])?a.forEach(collect):tp.push(a); collect(target.geometry.coordinates);
+    const px=tp.reduce((s,p)=>s+p[0],0)/tp.length-bounds.minX+pad, py=bounds.maxY-tp.reduce((s,p)=>s+p[1],0)/tp.length+pad;
+    mapHost.innerHTML=`<svg viewBox="0 0 ${width} ${height}" aria-label="Map showing ${person.location}"><g class="map-world">${buildings.features.map(f=>`<path class="map-building" d="${pathFor(f.geometry.coordinates)}"/>`).join('')}${frame.features.map(f=>`<path class="map-frame" d="${pathFor(f.geometry.coordinates)}"/>`).join('')}<circle class="map-pin-pulse" cx="${px}" cy="${py}" r="7"/><circle class="map-pin" cx="${px}" cy="${py}" r="6"/></g></svg><div class="map-controls"><button data-zoom="1.25" aria-label="Zoom in">+</button><button data-zoom="0.8" aria-label="Zoom out">−</button><button data-reset aria-label="Reset map">⌂</button></div>`;
+    const world=mapHost.querySelector('.map-world'); let scale=1, tx=0, ty=0, drag;
+    const apply=()=>world.setAttribute('transform',`translate(${tx} ${ty}) scale(${scale})`);
+    mapHost.querySelectorAll('[data-zoom]').forEach(b=>b.onclick=()=>{scale=Math.max(.7,Math.min(8,scale*+b.dataset.zoom));apply();});
+    mapHost.querySelector('[data-reset]').onclick=()=>{scale=1;tx=ty=0;apply();};
+    mapHost.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY,tx,ty};mapHost.setPointerCapture(e.pointerId);mapHost.classList.add('is-dragging');};
+    mapHost.onpointermove=e=>{if(!drag)return; const vb=width/mapHost.clientWidth;tx=drag.tx+(e.clientX-drag.x)*vb/scale;ty=drag.ty+(e.clientY-drag.y)*vb/scale;apply();};
+    mapHost.onpointerup=()=>{drag=null;mapHost.classList.remove('is-dragging');};
+    mapHost.onwheel=e=>{e.preventDefault();scale=Math.max(.7,Math.min(8,scale*(e.deltaY<0?1.15:.87)));apply();};
+  }
 });

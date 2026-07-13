@@ -5,10 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Garden of Memories — Grave Finder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="visitors css/style.css">
 </head>
 <body>
+
+<div class="intro-screen" id="introScreen" aria-hidden="true">
+  <div class="intro-bg-glow" aria-hidden="true"></div>
+  <div class="intro-logo-wrap">
+    <div class="intro-logo-shell">
+      <img src="../assets/logo.png" alt="Garden of Memories Logo" class="intro-logo">
+      <span class="intro-logo-line" aria-hidden="true"></span>
+    </div>
+    <h1 class="intro-title">Garden of Memories Memorial Park and Chapels</h1>
+    <p class="intro-subtitle">Taguig-Pateros</p>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav>
@@ -38,37 +50,39 @@
 
 <!-- HERO -->
 <div class="hero">
-  <video class="hero-video" autoplay loop muted playsinline>
-    <source src="../assets/gommp.mp4" type="video/mp4">
-  </video>
   <div class="hero-bg"></div>
   <div class="particles" id="particles"></div>
   <h1 class="hero-title">
     A Place of <em>Eternal Rest</em>
   </h1>
   <p class="hero-sub">
-    A trusted sanctuary where families find comfort, peace, and
-    a dignified place to honor those they love.
+    A trusted sanctuary where families find comfort, peace, and a dignified place to honor those they love.
   </p>
 
   <!-- Search -->
-  <form action="results.php" method="GET" class="search-box" onsubmit="validateSearchForm(event)">
+  <form action="results.html" method="GET" class="search-box" onsubmit="validateSearchForm(event)">
     <div class="field-group">
-      <label class="field-label">First Name</label>
+      <label class="field-label field-label-required">First Name <span aria-hidden="true">*</span></label>
       <input class="field-input" type="text" name="firstName" placeholder="e.g. Maria">
     </div>
     <div class="field-group">
-      <label class="field-label">Middle Name</label>
+      <label class="field-label field-label-optional">Middle Name</label>
       <input class="field-input" type="text" name="middleName" placeholder="e.g. Corpuz">
     </div>
     <div class="field-group">
-      <label class="field-label">Last Name</label>
+      <label class="field-label field-label-required">Last Name <span aria-hidden="true">*</span></label>
       <input class="field-input" type="text" name="lastName" placeholder="e.g. Santos">
     </div>
     <div class="field-group">
-      <label class="field-label">Relationship</label>
-      <select class="field-select" name="relationship" id="relationship-select">
-        <option disabled selected>Select...</option>
+      <label class="field-label field-label-optional">Death Year</label>
+      <select class="field-input" name="deathYear" id="death-year-select">
+        <option value="" selected>Select year...</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label class="field-label field-label-required">Relationship <span aria-hidden="true">*</span></label>
+      <select class="field-select" name="relationship" id="relationship-select" required>
+        <option value="" selected>Select...</option>
         <option>Spouse</option>
         <option>Parent</option>
         <option>Child</option>
@@ -77,13 +91,23 @@
       </select>
     </div>
     <div class="field-group" id="other-relationship-group" style="display: none;">
-      <label class="field-label">Specify Relationship</label>
-      <input class="field-input" type="text" name="otherRelationship" placeholder="e.g. Friend">
+      <label class="field-label field-label-required">Specify Relationship <span aria-hidden="true">*</span></label>
+      <input class="field-input" type="text" name="otherRelationship" id="otherRelationshipInput" placeholder="e.g. Friend">
     </div>
-    <button type="submit" class="search-btn">Locate Loved One →</button>
+    <button type="submit" class="search-btn">
+      <svg class="search-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle>
+        <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+      </svg>
+      Locate Loved One
+    </button>
   </form>
 
   <p class="hero-hours"><strong>Park Hours:</strong> 6:00 AM - 6:00 PM Daily &nbsp;|&nbsp; <strong>Office:</strong> 8:00 AM - 5:00 PM</p>
+</div>
+
+<div class="divider hero-section-divider" aria-hidden="true">
+  <div class="divider-line"></div>
 </div>
 
 <!-- MISSION -->
@@ -496,16 +520,39 @@
 
   function validateSearchForm(event) {
     const firstName = document.querySelector('input[name="firstName"]').value.trim();
-    const middleName = document.querySelector('input[name="middleName"]').value.trim();
     const lastName = document.querySelector('input[name="lastName"]').value.trim();
+    const deathYearInput = document.querySelector('[name="deathYear"]');
+    const deathYear = Number(deathYearInput.value);
+    const currentYear = new Date().getFullYear();
 
-    if (firstName === '' && middleName === '' && lastName === '') {
+    if (firstName === '' || lastName === '') {
       event.preventDefault(); // Stop form submission
       // Use the existing system message modal to show an error
-      document.getElementById('system-message-text').innerText = 'Please fill in at least one name field (First Name, Middle Name, or Last Name) to search.';
+      document.getElementById('system-message-text').innerText = 'Please fill in both First Name and Last Name to search. Middle name, year of passing, and relationship are optional.';
+      openModal('system-message-modal');
+      return;
+    }
+
+    if (deathYearInput.value && (deathYear < 1978 || deathYear > currentYear)) {
+      event.preventDefault();
+      document.getElementById('system-message-text').innerText = `Death year must be from 1978 up to ${currentYear} only.`;
       openModal('system-message-modal');
     }
   }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const deathYearSelect = document.getElementById('death-year-select');
+    if (deathYearSelect) {
+      const currentYear = new Date().getFullYear();
+
+      for (let year = currentYear; year >= 1978; year--) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        deathYearSelect.appendChild(option);
+      }
+    }
+  });
 </script>
 </body>
 </html>

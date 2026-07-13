@@ -1,0 +1,31 @@
+{
+  "name": "gravefinder",
+  "version": "1.0.0",
+  "description": "Cemetery Management and Grave Search System - Cross-Platform Web Application",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node dev-server.js",
+    "serve": "npx http-server",
+    "start": "npm run dev",
+    "test": "echo \"No tests configured yet\"",
+    "format": "npx prettier --write \"**/*.{html,css,js,json,md}\"",
+    "lint": "echo \"Linting configured through .editorconfig\""
+  },
+  "keywords": [
+    "cemetery",
+    "grave",
+    "burial",
+    "management",
+    "web-app"
+  ],
+  "author": "Capstone Project Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}
