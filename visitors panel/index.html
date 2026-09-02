@@ -24,13 +24,13 @@
 
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="nav-logo" style="text-decoration: none;">
+  <div class="nav-logo" aria-label="Garden of Memories Memorial Park and Chapels">
     <img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
     <div class="nav-brand-text">
       <span class="brand-main">Garden of Memories Memorial Park and Chapels</span>
       <span class="brand-sub">Grave Finder</span>
     </div>
-  </a>
+  </div>
   <div class="nav-menu-container">
     <button class="hamburger-btn" onclick="toggleMenu()" aria-label="Toggle Menu">
       <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--deep)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -103,7 +103,33 @@
     </button>
   </form>
 
-  <p class="hero-hours"><strong>Park Hours:</strong> 6:00 AM - 6:00 PM Daily &nbsp;|&nbsp; <strong>Office:</strong> 8:00 AM - 5:00 PM</p>
+  <div class="hero-hours" aria-label="Operating hours">
+    <div class="hours-item">
+      <span class="hours-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="8"></circle>
+          <path d="M12 7v5l3 2"></path>
+        </svg>
+      </span>
+      <span class="hours-copy">
+        <strong>Park Hours</strong>
+        <span>6:00 AM - 6:00 PM Daily</span>
+      </span>
+    </div>
+    <div class="hours-item">
+      <span class="hours-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 21V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v16"></path>
+          <path d="M16 8h3a1 1 0 0 1 1 1v12"></path>
+          <path d="M8 8h1M12 8h1M8 12h1M12 12h1M8 16h1M12 16h1M3 21h18"></path>
+        </svg>
+      </span>
+      <span class="hours-copy">
+        <strong>Office Hours</strong>
+        <span>8:00 AM - 5:00 PM</span>
+      </span>
+    </div>
+  </div>
 </div>
 
 <div class="divider hero-section-divider" aria-hidden="true">
@@ -504,55 +530,5 @@
 </footer>
 
 <script src="visitors javascripts/script.js"></script>
-<script>
-  function toggleMenu() {
-    document.getElementById('navDropdown').classList.toggle('active');
-  }
-
-  // Close the dropdown if the user clicks outside of it
-  window.addEventListener('click', function(e) {
-    const container = document.querySelector('.nav-menu-container');
-    const dropdown = document.getElementById('navDropdown');
-    if (container && dropdown && !container.contains(e.target)) {
-      dropdown.classList.remove('active');
-    }
-  });
-
-  function validateSearchForm(event) {
-    const firstName = document.querySelector('input[name="firstName"]').value.trim();
-    const lastName = document.querySelector('input[name="lastName"]').value.trim();
-    const deathYearInput = document.querySelector('[name="deathYear"]');
-    const deathYear = Number(deathYearInput.value);
-    const currentYear = new Date().getFullYear();
-
-    if (firstName === '' || lastName === '') {
-      event.preventDefault(); // Stop form submission
-      // Use the existing system message modal to show an error
-      document.getElementById('system-message-text').innerText = 'Please fill in both First Name and Last Name to search. Middle name, year of passing, and relationship are optional.';
-      openModal('system-message-modal');
-      return;
-    }
-
-    if (deathYearInput.value && (deathYear < 1978 || deathYear > currentYear)) {
-      event.preventDefault();
-      document.getElementById('system-message-text').innerText = `Death year must be from 1978 up to ${currentYear} only.`;
-      openModal('system-message-modal');
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const deathYearSelect = document.getElementById('death-year-select');
-    if (deathYearSelect) {
-      const currentYear = new Date().getFullYear();
-
-      for (let year = currentYear; year >= 1978; year--) {
-        const option = document.createElement('option');
-        option.value = year;
-        option.textContent = year;
-        deathYearSelect.appendChild(option);
-      }
-    }
-  });
-</script>
 </body>
 </html>

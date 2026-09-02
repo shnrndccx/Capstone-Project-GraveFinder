@@ -2,21 +2,21 @@
 .admin-wrapper {
   display: flex;
   min-height: 100vh;
-  padding-top: 75px; /* Account for fixed nav */
-  background: var(--bg-color);
+  padding-top: 86px;
+  background: #f8faf8;
 }
 
 /* Sidebar */
 .admin-sidebar {
-  width: 260px;
+  width: 280px;
   background: var(--ivory);
-  border-right: 1px solid rgba(139,168,142,0.2);
-  padding: 2rem 1.5rem;
+  border-right: 1px solid rgba(34,54,47,0.1);
+  padding: 1.6rem 1.2rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
   position: fixed;
-  top: 75px;
+  top: 86px;
   bottom: 0;
   overflow-y: auto;
 }
@@ -25,61 +25,92 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
 .sidebar-menu a {
   display: block;
-  padding: 0.8rem 1rem;
+  padding: 0.9rem 1rem;
   color: var(--charcoal);
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 500;
-  border-radius: 4px;
+  border-radius: 8px;
   transition: all 0.3s;
 }
 
 .sidebar-menu a:hover,
 .sidebar-menu a.active {
-  background: var(--cream);
+  background: rgba(63,111,88,0.08);
   color: var(--sage-dark);
-  border-left: 3px solid var(--sage-dark);
+  box-shadow: inset 3px 0 0 var(--sage-dark);
 }
 
 /* Main Content */
 .admin-content {
   flex: 1;
-  margin-left: 260px; /* Account for fixed sidebar */
-  padding: 3rem;
+  margin-left: 280px;
+  padding: 2.6rem 3rem 4rem;
 }
 
 .admin-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 2rem;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2.2rem;
+}
+
+.admin-header .section-title {
+  font-size: clamp(2.5rem, 4vw, 4.2rem);
+}
+
+.admin-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  flex: 0 0 auto;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid var(--sage-dark);
+  border-radius: 7px;
+  background: var(--sage-dark);
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+
+.admin-primary-btn:hover {
+  background: var(--deep);
+  box-shadow: 0 10px 24px rgba(34,54,47,0.12);
+  transform: translateY(-1px);
 }
 
 /* Stat Cards */
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
+  gap: 1.2rem;
   margin-bottom: 3rem;
 }
 
 .stat-card {
   background: var(--ivory);
-  border: 1px solid rgba(196,166,97,0.3);
-  padding: 1.5rem;
-  border-radius: 4px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.03);
-  border-top: 3px solid var(--gold);
+  border: 1px solid rgba(34,54,47,0.1);
+  padding: 1.35rem 1.45rem;
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(34,54,47,0.05);
+  border-top: 3px solid var(--blue);
 }
 
 .stat-card h3 {
   font-size: 0.7rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--stone);
   margin-bottom: 0.5rem;
@@ -87,7 +118,7 @@
 
 .stat-card .stat-value {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 2.5rem;
+  font-size: 2.65rem;
   color: var(--deep);
   line-height: 1;
 }
@@ -95,9 +126,10 @@
 /* Data Tables */
 .admin-table-container {
   background: var(--ivory);
-  border: 1px solid rgba(139,168,142,0.2);
-  border-radius: 4px;
+  border: 1px solid rgba(34,54,47,0.1);
+  border-radius: 8px;
   overflow-x: auto;
+  box-shadow: 0 14px 32px rgba(34,54,47,0.05);
 }
 
 .admin-table {
@@ -107,8 +139,8 @@
 }
 
 .admin-table th {
-  background: var(--cream);
-  padding: 1rem 1.5rem;
+  background: #fbfcfb;
+  padding: 1rem 1.35rem;
   font-size: 0.7rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -117,7 +149,7 @@
 }
 
 .admin-table td {
-  padding: 1rem 1.5rem;
+  padding: 1rem 1.35rem;
   font-size: 0.85rem;
   color: var(--charcoal);
   border-bottom: 1px solid rgba(139,168,142,0.1);
@@ -140,12 +172,46 @@
   font-size: 0.8rem;
   font-weight: 500;
   margin-right: 0.5rem;
+  padding: 0.25rem 0;
 }
 .action-btn.delete {
   color: #a35d5d;
 }
 .action-btn:hover {
-  text-decoration: underline;
+  color: var(--deep);
+  text-decoration: none;
+}
+
+@media (max-width: 900px) {
+  .admin-wrapper {
+    display: block;
+  }
+
+  .admin-sidebar {
+    position: static;
+    width: auto;
+    border-right: 0;
+    border-bottom: 1px solid rgba(34,54,47,0.1);
+  }
+
+  .sidebar-menu {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .sidebar-menu a {
+    white-space: nowrap;
+  }
+
+  .admin-content {
+    margin-left: 0;
+    padding: 1.6rem 1rem 3rem;
+  }
+
+  .admin-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 /* Status Badges */

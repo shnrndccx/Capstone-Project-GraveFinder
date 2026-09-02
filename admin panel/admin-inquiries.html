@@ -12,13 +12,13 @@
 <body>
 
 <nav>
-  <a href="../visitors panel/index.html" class="nav-logo" style="text-decoration: none;">
+  <div class="nav-logo" aria-label="Garden of Memories Memorial Park">
     <img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
     <div class="nav-brand-text">
       <span class="brand-main">Garden of Memories Memorial Park</span>
       <span class="brand-sub">Admin Panel</span>
     </div>
-  </a>
+  </div>
   <a href="admin-login.html" class="nav-cta" style="text-decoration: none;">Log Out</a>
 </nav>
 
@@ -42,7 +42,7 @@
     </div>
 
     <div class="admin-table-container">
-      <table class="admin-table">
+      <table class="admin-table" data-inquiries-table>
         <thead>
           <tr>
             <th>Date Received</th>
@@ -52,27 +52,7 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>Oct 25, 2025 - 08:15 AM</td>
-            <td>Mark Reyes <br><small>mark@email.com</small></td>
-            <td>Pricing for family estates</td>
-            <td><span class="status-badge status-new">New</span></td>
-            <td>
-              <button class="action-btn" onclick="openMessageModal('Mark Reyes', 'mark@email.com', 'Pricing for family estates', 'Hello, I would like to inquire about the pricing and availability of family estates in Section B. Thank you!')">View & Reply</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Oct 24, 2025 - 03:40 PM</td>
-            <td>Sarah Alonzo <br><small>sarah@email.com</small></td>
-            <td>Question about visiting hours on holidays</td>
-            <td><span class="status-badge status-read">Read</span></td>
-            <td>
-              <button class="action-btn" onclick="openMessageModal('Sarah Alonzo', 'sarah@email.com', 'Question about visiting hours on holidays', 'Hi, are you open during upcoming national holidays? Please let me know the schedule. Thanks.')">View</button>
-              <button class="action-btn delete" onclick="if(confirm('Are you sure you want to delete this message?')) this.closest('tr').remove();">Delete</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
   </main>
@@ -94,7 +74,7 @@
       </div>
     </div>
     
-    <form class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;" onsubmit="event.preventDefault(); document.getElementById('system-message-text').innerText = 'Reply sent successfully!'; closeModal(event, 'view-message-modal'); openModal('system-message-modal');">
+    <form id="reply-message-form" class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;">
       <div class="field-group">
         <label class="field-label">Your Reply</label>
         <textarea class="field-input" placeholder="Type your response here..." required></textarea>
@@ -118,14 +98,6 @@
 </div>
 
 <script src="../visitors panel/visitors javascripts/script.js"></script>
-<script>
-  function openMessageModal(sender, email, subject, message) {
-    document.getElementById('modal-sender-name').innerText = sender;
-    document.getElementById('modal-sender-email').innerText = email;
-    document.getElementById('modal-msg-subject').innerText = subject;
-    document.getElementById('modal-msg-body').innerText = message;
-    openModal('view-message-modal');
-  }
-</script>
+<script src="js/admin-pages.js"></script>
 </body>
 </html>

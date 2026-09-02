@@ -4,6 +4,7 @@ body {
   justify-content: center;
   min-height: 100vh;
   padding: 2rem;
+  position: relative;
   background: var(--bg-color);
   background-image:
     radial-gradient(ellipse 80% 80% at 50% -20%, rgba(139,168,142,0.1), transparent);
@@ -46,17 +47,53 @@ body {
 }
 
 .login-footer {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(139,168,142,0.15);
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 10;
 }
 
-.login-footer a {
-  font-size: 0.75rem;
-  color: var(--stone);
-  text-decoration: none;
-  transition: color 0.3s;
-}
-.login-footer a:hover {
+.back-main-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 34px;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid rgba(63,111,88,0.22);
+  border-radius: 6px;
+  background: rgba(63,111,88,0.05);
   color: var(--sage-dark);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.3s, border-color 0.3s, color 0.3s, transform 0.3s;
+}
+
+.back-main-link:hover {
+  background: var(--sage-dark);
+  border-color: var(--sage-dark);
+  color: var(--ivory);
+  transform: translateY(-1px);
+}
+
+.back-main-link span {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .login-footer {
+    top: 0.8rem;
+    right: 0.8rem;
+  }
+
+  .back-main-link {
+    min-height: 32px;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+  }
 }

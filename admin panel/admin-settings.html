@@ -12,13 +12,13 @@
 <body>
 
 <nav>
-  <a href="../visitors panel/index.html" class="nav-logo" style="text-decoration: none;">
+  <div class="nav-logo" aria-label="Garden of Memories Memorial Park">
     <img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
     <div class="nav-brand-text">
       <span class="brand-main">Garden of Memories Memorial Park</span>
       <span class="brand-sub">Admin Panel</span>
     </div>
-  </a>
+  </div>
   <a href="admin-login.html" class="nav-cta" style="text-decoration: none;">Log Out</a>
 </nav>
 
@@ -45,22 +45,22 @@
       <!-- Park Information Settings -->
       <div class="settings-card">
         <h3>Park Information</h3>
-        <form class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;" onsubmit="event.preventDefault(); alert('Park details updated successfully!');">
+        <form id="park-settings-form" class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;">
           <div class="field-group">
             <label class="field-label">Park Name</label>
-            <input class="field-input" type="text" value="Garden of Memories Memorial Park" required>
+            <input class="field-input" type="text" name="parkName" required>
           </div>
           <div class="field-group">
             <label class="field-label">Park Hours</label>
-            <input class="field-input" type="text" value="6:00 AM - 6:00 PM Daily" required>
+            <input class="field-input" type="text" name="parkHours" required>
           </div>
           <div class="field-group">
             <label class="field-label">Office Hours</label>
-            <input class="field-input" type="text" value="8:00 AM - 5:00 PM" required>
+            <input class="field-input" type="text" name="officeHours" required>
           </div>
           <div class="field-group">
             <label class="field-label">Public Contact Email</label>
-            <input class="field-input" type="email" value="info@gardenofmemories.com" required>
+            <input class="field-input" type="email" name="publicEmail" required>
           </div>
           <button type="submit" class="submit-btn" style="margin-top: 1rem;">Save Changes</button>
         </form>
@@ -69,18 +69,18 @@
       <!-- Account Settings -->
       <div class="settings-card">
         <h3>Admin Account</h3>
-        <form class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;" onsubmit="event.preventDefault(); alert('Account credentials updated successfully!');">
+        <form id="account-settings-form" class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;">
           <div class="field-group">
             <label class="field-label">Admin Name</label>
-            <input class="field-input" type="text" value="System Administrator" required>
+            <input class="field-input" type="text" name="adminName" required>
           </div>
           <div class="field-group">
             <label class="field-label">Admin Login Email</label>
-            <input class="field-input" type="email" value="admin@gardenofmemories.com" required>
+            <input class="field-input" type="email" name="adminEmail" required>
           </div>
           <div class="field-group">
             <label class="field-label">Update Password</label>
-            <input class="field-input" type="password" placeholder="Enter new password to update">
+            <input class="field-input" type="password" name="adminPassword" placeholder="Enter new password to update">
           </div>
           <button type="submit" class="submit-btn" style="margin-top: 1rem;">Update Account</button>
         </form>
@@ -89,5 +89,6 @@
   </main>
 </div>
 <script src="../visitors panel/visitors javascripts/script.js"></script>
+<script src="js/admin-pages.js"></script>
 </body>
 </html>

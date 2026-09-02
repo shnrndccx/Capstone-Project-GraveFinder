@@ -12,13 +12,13 @@
 <body>
 
 <nav>
-  <a href="../visitors panel/index.html" class="nav-logo" style="text-decoration: none;">
+  <div class="nav-logo" aria-label="Garden of Memories Memorial Park">
     <img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
     <div class="nav-brand-text">
       <span class="brand-main">Garden of Memories Memorial Park</span>
       <span class="brand-sub">Admin Panel</span>
     </div>
-  </a>
+  </div>
   <a href="admin-login.html" class="nav-cta" style="text-decoration: none;">Log Out</a>
 </nav>
 
@@ -42,7 +42,7 @@
     </div>
 
     <div class="admin-table-container">
-      <table class="admin-table">
+      <table class="admin-table" data-appointments-table>
         <thead>
           <tr>
             <th>Date & Time</th>
@@ -53,27 +53,7 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>Oct 28, 2025 - 10:00 AM</td>
-            <td>Juan Dela Cruz</td>
-            <td>Burial Lots</td>
-            <td>+63 917 123 4567</td>
-            <td><span class="status-badge status-pending">Pending</span></td>
-            <td>
-              <button class="action-btn" onclick="let badge = this.closest('tr').querySelector('.status-badge'); badge.className = 'status-badge status-confirmed'; badge.innerText = 'Confirmed'; this.remove();">Confirm</button>
-              <button class="action-btn delete" onclick="if(confirm('Are you sure you want to cancel this appointment?')) this.closest('tr').remove();">Cancel</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Oct 29, 2025 - 02:30 PM</td>
-            <td>Elena Rosales</td>
-            <td>Chapel Services</td>
-            <td>elena@example.com</td>
-            <td><span class="status-badge status-confirmed">Confirmed</span></td>
-            <td><button class="action-btn" onclick="openModal('edit-appointment-modal')">Edit</button></td>
-          </tr>
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
   </main>
@@ -87,10 +67,10 @@
     <h2 class="section-title" style="margin-top:0; font-size: 2.2rem;">Edit <em>Appointment</em></h2>
     <div class="gold-bar"></div>
     
-    <form class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;" onsubmit="event.preventDefault(); document.getElementById('system-message-text').innerText = 'Appointment updated successfully!'; closeModal(event, 'edit-appointment-modal'); openModal('system-message-modal');">
+    <form id="edit-appointment-form" class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;">
       <div class="field-group">
         <label class="field-label">Date & Time</label>
-        <input class="field-input" type="datetime-local" value="2025-10-29T14:30" required>
+        <input class="field-input" type="datetime-local" name="dateTime" required>
       </div>
       <button type="submit" class="submit-btn" style="margin-top: 1rem;">Save Changes</button>
     </form>
@@ -111,5 +91,6 @@
 </div>
 
 <script src="../visitors panel/visitors javascripts/script.js"></script>
+<script src="js/admin-pages.js"></script>
 </body>
 </html>
