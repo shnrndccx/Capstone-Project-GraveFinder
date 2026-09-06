@@ -48,6 +48,19 @@ const relationshipSelect = document.getElementById('relationship-select');
 const otherRelationshipGroup = document.getElementById('other-relationship-group');
 const otherRelationshipInput = document.getElementById('otherRelationshipInput');
 
+// Prevent numbers and other non-letter characters in name-like fields, including pasted text.
+document.querySelectorAll('.letters-only').forEach(input => {
+  input.addEventListener('beforeinput', event => {
+    if (event.data && /[^\p{L}' -]/u.test(event.data)) {
+      event.preventDefault();
+    }
+  });
+
+  input.addEventListener('input', () => {
+    input.value = input.value.replace(/[^\p{L}' -]/gu, '');
+  });
+});
+
 if (relationshipSelect && otherRelationshipGroup && otherRelationshipInput) {
   relationshipSelect.addEventListener('change', event => {
     if (event.target.value === 'Other') {
@@ -97,6 +110,7 @@ window.addEventListener('click', event => {
 function validateSearchForm(event) {
   const firstName = document.querySelector('input[name="firstName"]').value.trim();
   const lastName = document.querySelector('input[name="lastName"]').value.trim();
+  const nameFields = document.querySelectorAll('.letters-only');
   const deathYearInput = document.querySelector('[name="deathYear"]');
   const deathYear = Number(deathYearInput.value);
   const currentYear = new Date().getFullYear();
@@ -104,6 +118,13 @@ function validateSearchForm(event) {
   if (firstName === '' || lastName === '') {
     event.preventDefault();
     document.getElementById('system-message-text').innerText = 'Please fill in both First Name and Last Name to search. Middle name, year of passing, and relationship are optional.';
+    openModal('system-message-modal');
+    return;
+  }
+
+  if ([...nameFields].some(field => !/^[\p{L}' -]*$/u.test(field.value))) {
+    event.preventDefault();
+    document.getElementById('system-message-text').innerText = 'Names and relationship details may contain letters only.';
     openModal('system-message-modal');
     return;
   }

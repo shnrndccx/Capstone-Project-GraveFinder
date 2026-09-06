@@ -153,12 +153,14 @@
 .cemetery-map { position:relative; flex:1; min-height:350px; overflow:hidden; background:#dfe8dc; cursor:grab; touch-action:none; }
 .cemetery-map.is-dragging { cursor:grabbing; }
 .cemetery-map svg { width:100%; height:100%; display:block; }
+.cemetery-map-image { position:absolute; inset:0; width:100%; height:100%; display:block; object-fit:contain; background:#fff; transform-origin:center; user-select:none; -webkit-user-drag:none; pointer-events:none; }
+.map-location-badge { position:absolute; top:1rem; left:1rem; max-width:calc(100% - 2rem); padding:.45rem .7rem; border-radius:4px; background:rgba(34,54,47,.9); color:#fff; font-size:.75rem; }
 .map-building { fill:#f3eee1; stroke:#7e987f; stroke-width:.8; vector-effect:non-scaling-stroke; }
 .map-frame { fill:none; stroke:#385b44; stroke-width:2; vector-effect:non-scaling-stroke; }
 .map-pin { fill:#a54b3e; stroke:#fff; stroke-width:2; vector-effect:non-scaling-stroke; filter:drop-shadow(0 2px 2px rgba(0,0,0,.4)); }
 .map-pin-pulse { fill:#a54b3e; opacity:.25; transform-box:fill-box; transform-origin:center; animation:pinPulse 1.8s infinite; }
 @keyframes pinPulse { 70%,100% { transform:scale(2.8); opacity:0; } }
-.map-controls { position:absolute; right:14px; bottom:14px; display:grid; gap:5px; }
+.map-controls { position:absolute; right:14px; bottom:14px; display:grid; gap:5px; z-index:2; }
 .map-controls button { width:36px; height:36px; border:1px solid rgba(30,54,37,.22); border-radius:3px; background:#fff; color:var(--deep); font-size:1.2rem; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.12); }
 .map-loading { position:absolute; inset:0; display:grid; place-items:center; color:var(--sage-dark); }
 .map-footer { display:flex; align-items:center; gap:1.2rem; padding:.75rem 1.2rem; color:var(--stone); font-size:.68rem; }

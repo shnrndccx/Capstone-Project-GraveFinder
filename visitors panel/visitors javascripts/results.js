@@ -223,7 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const mapModal = document.getElementById('map-modal');
   const mapHost = document.getElementById('cemetery-map');
-  let mapDataPromise;
 
   function openCemeteryMap(person) {
     document.getElementById('map-person-name').textContent = person.name;
@@ -231,19 +230,104 @@ document.addEventListener('DOMContentLoaded', () => {
     mapModal.classList.add('is-open');
     mapModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    mapDataPromise ||= Promise.all([
-      fetch('../assets/map-data/buildings.geojson').then(r => { if (!r.ok) throw Error('Map unavailable'); return r.json(); }),
-      fetch('../assets/map-data/frame.geojson').then(r => r.json())
-    ]);
-    mapDataPromise.then(([buildings, frame]) => renderMap(buildings, frame, person)).catch(() => {
-      mapHost.innerHTML = '<div class="map-loading">The map could not be loaded. Please run the site through a local web server.</div>';
-    });
+    mapHost.innerHTML = `
+      <img class="cemetery-map-image" src="../assets/garden_of_memories_traffic_flow%20-%20Copy.svg" alt="Garden of Memories Memorial Park traffic flow map">
+      <div class="map-location-badge">${person.location}</div>
+      <div class="map-controls">
+        <button type="button" data-map-zoom="1.25" aria-label="Zoom in">+</button>
+        <button type="button" data-map-zoom="0.8" aria-label="Zoom out">−</button>
+        <button type="button" data-map-reset aria-label="Reset map">⌂</button>
+      </div>
+    `;
+    setupImageMapControls();
   }
 
   function closeCemeteryMap() { mapModal.classList.remove('is-open'); mapModal.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
   document.getElementById('map-close').addEventListener('click', closeCemeteryMap);
   mapModal.addEventListener('click', e => { if (e.target === mapModal) closeCemeteryMap(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCemeteryMap(); });
+
+  function setupImageMapControls() {
+    const image = mapHost.querySelector('.cemetery-map-image');
+    if (!image) return;
+
+    let scale = 1;
+    let offsetX = 0;
+    let offsetY = 0;
+    let dragStart;
+    let pinchStart;
+
+    const applyTransform = () => {
+      image.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+    };
+
+    const setScale = nextScale => {
+      scale = Math.max(1, Math.min(5, nextScale));
+      applyTransform();
+    };
+
+    mapHost.querySelectorAll('[data-map-zoom]').forEach(button => {
+      button.addEventListener('click', () => setScale(scale * Number(button.dataset.mapZoom)));
+    });
+
+    mapHost.querySelector('[data-map-reset]').addEventListener('click', () => {
+      scale = 1;
+      offsetX = 0;
+      offsetY = 0;
+      applyTransform();
+    });
+
+    mapHost.addEventListener('pointerdown', event => {
+      if (event.target.closest('.map-controls')) return;
+      dragStart = { x: event.clientX, y: event.clientY, offsetX, offsetY };
+      mapHost.setPointerCapture(event.pointerId);
+      mapHost.classList.add('is-dragging');
+    });
+
+    mapHost.addEventListener('pointermove', event => {
+      if (!dragStart) return;
+      offsetX = dragStart.offsetX + event.clientX - dragStart.x;
+      offsetY = dragStart.offsetY + event.clientY - dragStart.y;
+      applyTransform();
+    });
+
+    const stopDragging = event => {
+      if (dragStart && mapHost.hasPointerCapture(event.pointerId)) {
+        mapHost.releasePointerCapture(event.pointerId);
+      }
+      dragStart = null;
+      mapHost.classList.remove('is-dragging');
+    };
+
+    mapHost.addEventListener('pointerup', stopDragging);
+    mapHost.addEventListener('pointercancel', stopDragging);
+
+    mapHost.addEventListener('wheel', event => {
+      event.preventDefault();
+      setScale(scale * (event.deltaY < 0 ? 1.15 : 0.87));
+    }, { passive: false });
+
+    mapHost.addEventListener('touchstart', event => {
+      if (event.touches.length !== 2) return;
+      const first = event.touches[0];
+      const second = event.touches[1];
+      pinchStart = {
+        distance: Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY),
+        scale
+      };
+    }, { passive: true });
+
+    mapHost.addEventListener('touchmove', event => {
+      if (!pinchStart || event.touches.length !== 2) return;
+      event.preventDefault();
+      const first = event.touches[0];
+      const second = event.touches[1];
+      const distance = Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY);
+      setScale(pinchStart.scale * distance / pinchStart.distance);
+    }, { passive: false });
+
+    mapHost.addEventListener('touchend', () => { pinchStart = null; }, { passive: true });
+  }
 
   function renderMap(buildings, frame, person, host = mapHost, showControls = true) {
     const all = [...buildings.features, ...frame.features];

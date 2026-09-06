@@ -63,15 +63,15 @@
   <form action="results.html" method="GET" class="search-box" onsubmit="validateSearchForm(event)">
     <div class="field-group">
       <label class="field-label field-label-required">First Name <span aria-hidden="true">*</span></label>
-      <input class="field-input" type="text" name="firstName" placeholder="e.g. Maria">
+      <input class="field-input letters-only" type="text" name="firstName" placeholder="e.g. Maria" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' -]+" title="Please enter letters only.">
     </div>
     <div class="field-group">
       <label class="field-label field-label-optional">Middle Name</label>
-      <input class="field-input" type="text" name="middleName" placeholder="e.g. Corpuz">
+      <input class="field-input letters-only" type="text" name="middleName" placeholder="e.g. Corpuz" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' -]+" title="Please enter letters only.">
     </div>
     <div class="field-group">
       <label class="field-label field-label-required">Last Name <span aria-hidden="true">*</span></label>
-      <input class="field-input" type="text" name="lastName" placeholder="e.g. Santos">
+      <input class="field-input letters-only" type="text" name="lastName" placeholder="e.g. Santos" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' -]+" title="Please enter letters only.">
     </div>
     <div class="field-group">
       <label class="field-label field-label-optional">Death Year</label>
@@ -92,7 +92,7 @@
     </div>
     <div class="field-group" id="other-relationship-group" style="display: none;">
       <label class="field-label field-label-required">Specify Relationship <span aria-hidden="true">*</span></label>
-      <input class="field-input" type="text" name="otherRelationship" id="otherRelationshipInput" placeholder="e.g. Friend">
+      <input class="field-input letters-only" type="text" name="otherRelationship" id="otherRelationshipInput" placeholder="e.g. Friend" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' -]+" title="Please enter letters only.">
     </div>
     <button type="submit" class="search-btn">
       <svg class="search-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
