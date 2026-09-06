@@ -103,16 +103,18 @@
   padding: 1.35rem 1.5rem .9rem;
 }
 .result-icon {
-  flex: 0 0 64px;
-  width: 64px;
+  flex: 0 0 84px;
+  width: 84px;
   height: 84px;
   display: grid;
   place-items: center;
-  color: #dce7bd;
-  background: var(--deep);
+  background: #fff;
+  border: 0;
+  box-shadow: none;
   border-radius: 9px;
 }
 .result-icon svg { width: 27px; height: 27px; }
+.result-icon img { width: 84px; height: 84px; object-fit: contain; display: block; }
 .result-copy { min-width: 0; }
 .result-info .name {
   font-family: 'Cormorant Garamond', serif;
@@ -348,6 +350,11 @@
     flex-basis: 48px;
     width: 48px;
     height: 64px;
+  }
+
+  .result-icon img {
+    width: 70px;
+    height: 70px;
   }
 
   .result-info .name {
