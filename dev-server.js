@@ -33,7 +33,10 @@ console.log('   • Open http://localhost:8000 in your browser');
 console.log('   • Press Ctrl+C to stop the server');
 console.log('   • Files are auto-reloaded (refresh your browser)\n');
 
-const server = spawn(command, args, { stdio: 'inherit' });
+const server = spawn(command, args, {
+  stdio: 'inherit',
+  shell: isWindows
+});
 
 server.on('close', (code) => {
   if (code !== 0 && code !== null) {

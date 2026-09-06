@@ -53,6 +53,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // 3. Setup dummy data for demonstration
   // (In a real application, you would make an API call to a database here based on 'searchName')
   const dummyData = [
+    { name: 'Elidoro Gonzales Capco', born: 'July 3, 1934', died: 'April 12, 2017', location: 'Garden of Eden, Lot GOE-A-153' },
+    { name: 'Pelagia S. Capco', born: 'March 23, 1936', died: 'March 28, 2008', location: 'Garden of Eden, Lot GOE-A-153' },
+    { name: 'Felix F. Capco', born: 'January 27, 1951', died: 'December 25, 2004', location: 'Garden of Eden, Lot GOE-A-154' },
+    { name: 'Jaime Diaz Diosana', born: 'January 12, 1946', died: 'January 10, 2014', location: 'Garden of Eden, Lot GOE-A-155' },
+    { name: 'Baltazar C. Napole', born: 'December 21, 1946', died: 'January 15, 1999', location: 'Garden of Eden, Lot GOE-A-156' },
+    { name: 'Anita Sebastian Napole', born: 'May 6, 1948', died: 'March 17, 2025', location: 'Garden of Eden, Lot GOE-A-156' },
+    { name: 'Donato Santos Mejia', born: 'January 25, 1945', died: 'December 15, 2012', location: 'Garden of Eden, Lot GOE-A-157' },
+    { name: 'Crisanto Viseño Vidamo', born: 'October 11, 1939', died: 'April 24, 2024', location: 'Garden of Eden, Lot GOE-A-159' },
+    { name: 'Magdalena L. Licuanan', born: 'July 22, 1928', died: 'April 10, 2011', location: 'Garden of Eden, Lot GOE-A-160' },
+    { name: 'Jose Jr. Vercles', born: 'March 8, 1942', died: 'January 1, 2003', location: 'Garden of Eden, Lot GOE-A-162' },
+    { name: 'Norma R. Vercles', born: 'February 19, 1934', died: 'July 5, 2004', location: 'Garden of Eden, Lot GOE-A-162' },
+    { name: 'Benigna E. Martil', born: 'May 6, 1943', died: 'June 6, 2009', location: 'Garden of Eden, Lot GOE-A-163' },
+    { name: 'Librada M. Rayos', born: 'January 17, 1941', died: 'November 24, 2008', location: 'Garden of Eden, Lot GOE-A-163' },
+    { name: 'Bernardo F. Bulatao', born: 'February 26, 1956', died: 'April 29, 1987', location: 'Garden of Eden, Lot GOE-A-164' },
+    { name: 'Roberto M. Bulatao', born: 'December 16, 1976', died: 'February 19, 2005', location: 'Garden of Eden, Lot GOE-A-164' },
+    { name: 'Belen Magnait Gonzales', born: 'May 14, 1942', died: 'March 2, 2013', location: 'Garden of Eden, Lot GOE-A-21' },
+    { name: 'Belinda G. Umagat', born: 'February 5, 1967', died: 'September 27, 2010', location: 'Garden of Eden, Lot GOE-A-21' },
+    { name: 'Ignacio Santos Umagat', born: 'December 30, 1932', died: 'November 17, 2027', location: 'Garden of Eden, Lot GOE-A-21' },
+    { name: 'Ricardo Beltran Velasco', born: 'July 7, 1955', died: 'March 1, 2019', location: 'Garden of Eden, Lot GOE-A-555' },
+    { name: 'Francisco R. David', born: 'July 27, 1932', died: 'June 9, 2009', location: 'Garden of Eden, Lot GOE-A-561' },
+    { name: 'Alberto R. De Dios', born: 'January 9, 1930', died: 'March 16, 1988', location: 'Garden of Eden, Lot GOE-B-718' },
+    { name: 'Joseph Alvin De Guzman De Dios', born: 'November 28, 1970', died: 'May 5, 2025', location: 'Garden of Eden, Lot GOE-B-718' },
+    { name: 'Isabel Lactao Cruz', born: 'May 10, 1933', died: 'June 30, 2021', location: 'Garden of Eden, Lot GOE-B-719' },
+    { name: 'Adriano M. Cruz', born: 'March 5, 1931', died: 'December 26, 1998', location: 'Garden of Eden, Lot GOE-B-719' },
     { name: firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Maria Santos', born: 'January 15, 1945', died: 'December 12, 2020', location: 'Section D, Plot 12' },
     { name: 'Sol Martinez Alvarez', born: 'March 10, 1955', died: 'July 22, 2021', location: 'Section B, Plot 14' },
     { name: 'Sol Martinez Bautista', born: 'August 24, 1960', died: 'November 5, 2019', location: 'Section C, Plot 8' },
@@ -221,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
   mapModal.addEventListener('click', e => { if (e.target === mapModal) closeCemeteryMap(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCemeteryMap(); });
 
-  function renderMap(buildings, frame, person) {
+  function renderMap(buildings, frame, person, host = mapHost, showControls = true) {
     const all = [...buildings.features, ...frame.features];
     const points = [];
     const walk = value => Array.isArray(value?.[0]) ? value.forEach(walk) : points.push(value);
@@ -234,14 +258,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const candidates=buildings.features.filter(f=>f.geometry.coordinates);
     const target=candidates[hash%candidates.length]; const tp=[]; const collect=a=>Array.isArray(a?.[0])?a.forEach(collect):tp.push(a); collect(target.geometry.coordinates);
     const px=tp.reduce((s,p)=>s+p[0],0)/tp.length-bounds.minX+pad, py=bounds.maxY-tp.reduce((s,p)=>s+p[1],0)/tp.length+pad;
-    mapHost.innerHTML=`<svg viewBox="0 0 ${width} ${height}" aria-label="Map showing ${person.location}"><g class="map-world">${buildings.features.map(f=>`<path class="map-building" d="${pathFor(f.geometry.coordinates)}"/>`).join('')}${frame.features.map(f=>`<path class="map-frame" d="${pathFor(f.geometry.coordinates)}"/>`).join('')}<circle class="map-pin-pulse" cx="${px}" cy="${py}" r="7"/><circle class="map-pin" cx="${px}" cy="${py}" r="6"/></g></svg><div class="map-controls"><button data-zoom="1.25" aria-label="Zoom in">+</button><button data-zoom="0.8" aria-label="Zoom out">−</button><button data-reset aria-label="Reset map">⌂</button></div>`;
-    const world=mapHost.querySelector('.map-world'); let scale=1, tx=0, ty=0, drag;
+    host.innerHTML=`<svg viewBox="0 0 ${width} ${height}" aria-label="Map showing ${person.location}"><g class="map-world">${buildings.features.map(f=>`<path class="map-building" d="${pathFor(f.geometry.coordinates)}"/>`).join('')}${frame.features.map(f=>`<path class="map-frame" d="${pathFor(f.geometry.coordinates)}"/>`).join('')}<circle class="map-pin-pulse" cx="${px}" cy="${py}" r="7"/><circle class="map-pin" cx="${px}" cy="${py}" r="6"/></g></svg>${showControls ? '<div class="map-controls"><button data-zoom="1.25" aria-label="Zoom in">+</button><button data-zoom="0.8" aria-label="Zoom out">−</button><button data-reset aria-label="Reset map">⌂</button></div>' : ''}`;
+    const world=host.querySelector('.map-world'); let scale=1, tx=0, ty=0, drag;
     const apply=()=>world.setAttribute('transform',`translate(${tx} ${ty}) scale(${scale})`);
-    mapHost.querySelectorAll('[data-zoom]').forEach(b=>b.onclick=()=>{scale=Math.max(.7,Math.min(8,scale*+b.dataset.zoom));apply();});
-    mapHost.querySelector('[data-reset]').onclick=()=>{scale=1;tx=ty=0;apply();};
-    mapHost.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY,tx,ty};mapHost.setPointerCapture(e.pointerId);mapHost.classList.add('is-dragging');};
-    mapHost.onpointermove=e=>{if(!drag)return; const vb=width/mapHost.clientWidth;tx=drag.tx+(e.clientX-drag.x)*vb/scale;ty=drag.ty+(e.clientY-drag.y)*vb/scale;apply();};
-    mapHost.onpointerup=()=>{drag=null;mapHost.classList.remove('is-dragging');};
-    mapHost.onwheel=e=>{e.preventDefault();scale=Math.max(.7,Math.min(8,scale*(e.deltaY<0?1.15:.87)));apply();};
+    host.querySelectorAll('[data-zoom]').forEach(b=>b.onclick=()=>{scale=Math.max(.7,Math.min(8,scale*+b.dataset.zoom));apply();});
+    const resetButton = host.querySelector('[data-reset]');
+    if (resetButton) resetButton.onclick=()=>{scale=1;tx=ty=0;apply();};
+    host.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY,tx,ty};host.setPointerCapture(e.pointerId);host.classList.add('is-dragging');};
+    host.onpointermove=e=>{if(!drag)return; const vb=width/host.clientWidth;tx=drag.tx+(e.clientX-drag.x)*vb/scale;ty=drag.ty+(e.clientY-drag.y)*vb/scale;apply();};
+    host.onpointerup=()=>{drag=null;host.classList.remove('is-dragging');};
+    host.onwheel=e=>{e.preventDefault();scale=Math.max(.7,Math.min(8,scale*(e.deltaY<0?1.15:.87)));apply();};
   }
+
 });

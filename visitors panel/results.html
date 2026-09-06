@@ -51,17 +51,27 @@
 <!-- Template for Dynamic Result Cards -->
 <template id="result-card-template">
   <div class="result-card">
+    <div class="result-map-preview" aria-label="Cemetery map preview">
+      <img src="../assets/garden_of_memories_traffic_flow%20-%20Copy.svg" alt="Garden of Memories Memorial Park traffic flow map">
+    </div>
     <div class="result-info">
-      <h2 class="name"></h2>
+      <div class="result-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M12 20V4M6 10h12M8.5 7.5h7M8.5 12.5h7"></path>
+        </svg>
+      </div>
+      <div class="result-copy">
+        <h2 class="name"></h2>
       <div class="details" style="display: flex; flex-direction: column; gap: 0.3rem;">
         <span class="born-detail"></span>
         <span class="died-detail"></span>
         <span class="location-detail"></span>
       </div>
+      </div>
     </div>
     <button type="button" class="locate-btn">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12A7 7 0 1 0 5 9c0 5.8 7 12 7 12Z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
-      Locate a Loved One
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h13M13 7l5 5-5 5"></path></svg>
+      Get directions
     </button>
   </div>
 </template>
