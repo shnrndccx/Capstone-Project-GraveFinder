@@ -49,6 +49,7 @@
 /* Main Content */
 .admin-content {
   flex: 1;
+  min-width: 0;
   margin-left: 280px;
   padding: 2.6rem 3rem 4rem;
 }
@@ -63,6 +64,16 @@
 
 .admin-header .section-title {
   font-size: clamp(2.5rem, 4vw, 4.2rem);
+}
+
+.admin-header > * {
+  min-width: 0;
+}
+
+.admin-content > .search-box {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
 }
 
 .admin-primary-btn {
@@ -134,6 +145,7 @@
 
 .admin-table {
   width: 100%;
+  min-width: 760px;
   border-collapse: collapse;
   text-align: left;
 }
@@ -153,6 +165,11 @@
   font-size: 0.85rem;
   color: var(--charcoal);
   border-bottom: 1px solid rgba(139,168,142,0.1);
+}
+
+.admin-table th:last-child,
+.admin-table td:last-child {
+  white-space: nowrap;
 }
 
 .admin-table tr:last-child td {
@@ -211,6 +228,10 @@
   .admin-header {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .admin-header .admin-primary-btn {
+    align-self: stretch;
   }
 }
 

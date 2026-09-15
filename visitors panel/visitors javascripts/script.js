@@ -136,6 +136,49 @@ function validateSearchForm(event) {
   }
 }
 
+// Validates appointment requests for dates in the current month and park hours.
+function submitAppointment(event) {
+  event.preventDefault();
+
+  const form = event.target;
+  const dateInput = form.querySelector('[name="appointmentDate"]');
+  const timeInput = form.querySelector('[name="appointmentTime"]');
+  const selectedDate = new Date(`${dateInput.value}T00:00:00`);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  const timeValue = timeInput.value;
+
+  if (!dateInput.value || selectedDate < today || selectedDate > lastDayOfMonth) {
+    document.getElementById('system-message-text').innerText = 'Please select an appointment date from today through the end of this month.';
+    openModal('system-message-modal');
+    return;
+  }
+
+  if (!timeValue || timeValue < '08:00' || timeValue > '17:00') {
+    document.getElementById('system-message-text').innerText = 'Please select an appointment time between 8:00 AM and 5:00 PM.';
+    openModal('system-message-modal');
+    return;
+  }
+
+  document.getElementById('system-message-text').innerText = 'Your appointment details are valid. Please contact a staff member using the contact details to confirm the schedule.';
+  closeModal(event, 'appointment-modal');
+  openModal('system-message-modal');
+  form.reset();
+}
+
+// Keeps appointment time input within the office schedule while the visitor types.
+function validateAppointmentTime(input) {
+  const isOutsideOfficeHours = input.value && (input.value < '08:00' || input.value > '17:00');
+  if (isOutsideOfficeHours) {
+    input.value = '';
+    input.setCustomValidity('Appointments are available only from 8:00 AM to 5:00 PM.');
+    return;
+  }
+
+  input.setCustomValidity('');
+}
+
 // Builds the year dropdown from the current year down to the park's founding year.
 document.addEventListener('DOMContentLoaded', () => {
   const deathYearSelect = document.getElementById('death-year-select');
@@ -148,4 +191,23 @@ document.addEventListener('DOMContentLoaded', () => {
     option.textContent = year;
     deathYearSelect.appendChild(option);
   }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const appointmentDate = document.getElementById('appointment-date');
+  const dateHelp = document.getElementById('appointment-date-help');
+  if (!appointmentDate) return;
+
+  const formatDate = date => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const today = new Date();
+  const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  appointmentDate.min = formatDate(today);
+  appointmentDate.max = formatDate(lastDayOfMonth);
+  dateHelp.textContent = `Available until ${lastDayOfMonth.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}.`;
 });

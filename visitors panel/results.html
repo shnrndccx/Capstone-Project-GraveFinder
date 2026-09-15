@@ -24,22 +24,19 @@
       <span class="brand-sub">Grave Finder</span>
     </div>
   </div>
-  <a href="index.html" class="nav-cta" style="text-decoration: none;">Back to Home</a>
+  <a href="/homepage.html" class="nav-cta" style="text-decoration: none;">Back to Home</a>
 </nav>
 
 <header class="page-header">
   <h1 class="page-title">Search <em>Results</em></h1>
   <p id="search-query-display" class="results-summary">Loading results...</p>
-  <button class="nav-cta" style="margin-top: 0.5rem; background: transparent;" onclick="openModal('filter-modal')">
-    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 0.3rem;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filter Results
-  </button>
-  
+  <button type="button" class="search-help-button" aria-label="Get help finding a loved one" title="Need help finding a loved one?" onclick="openModal('search-help-modal')">?</button>
   <div id="privacy-notice-panel" style="margin-top: 1rem; display: flex; justify-content: center;">
     <div style="display: inline-flex; align-items: center; gap: 0.6rem; background: rgba(196,166,97,0.1); border: 1px solid rgba(196,166,97,0.4); padding: 0.6rem 1.2rem; border-radius: 4px; font-size: 0.85rem; color: var(--charcoal);">
       <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--gold)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
       </svg>
-      <span id="privacy-notice-text"><strong>Privacy Notice:</strong> Personal details will be blurred in 15 seconds.</span>
+      <span id="privacy-notice-text"><strong>Privacy Notice:</strong> Personal details will be blurred in 60 seconds.</span>
     </div>
   </div>
 </header>
@@ -48,12 +45,36 @@
   <!-- JavaScript will dynamically inject the search results here -->
 </main>
 
+<div id="search-help-modal" class="modal-overlay" onclick="closeModal(event, 'search-help-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 520px; text-align: center;">
+    <button class="modal-close" aria-label="Close Help" onclick="closeModal(event, 'search-help-modal')">✕</button>
+    <p class="section-tag" style="justify-content: center;">Need assistance?</p>
+    <h2 class="section-title" style="margin-top: 0; font-size: 2rem;">Can’t Find Your <em>Loved One?</em></h2>
+    <div class="gold-bar" style="margin: 0 auto 1rem;"></div>
+    <p class="section-body" style="margin-bottom: 1rem;">If your loved one cannot be found, please reach out to a staff member for assistance with your inquiry.</p>
+    <button type="button" class="staff-contact-button" onclick="openModal('staff-contact-modal')">Contact a Staff</button>
+  </div>
+</div>
+
+<div id="staff-contact-modal" class="modal-overlay" onclick="closeModal(event, 'staff-contact-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 480px; text-align: center;">
+    <button class="modal-close" aria-label="Close Contact Details" onclick="closeModal(event, 'staff-contact-modal')">✕</button>
+    <p class="section-tag" style="justify-content: center;">Staff Contact Details</p>
+    <h2 class="section-title" style="margin-top: 0; font-size: 2rem;">Reach Out <em>to Us</em></h2>
+    <div class="gold-bar" style="margin: 0 auto 1rem;"></div>
+    <div style="padding: 0.9rem 1rem; border: 1px solid rgba(196,166,97,0.55); border-radius: 6px; background: rgba(196,166,97,0.08); color: var(--deep); line-height: 1.8; text-align: left;">
+      <strong style="display: block; margin-bottom: 0.25rem;">Tel. Nos.</strong>
+      <span>0960-231-5608</span><br>
+      <span>0960-515-2162</span><br>
+      <strong style="display: block; margin-top: 0.6rem; margin-bottom: 0.25rem;">Email</strong>
+      <span>gmmc@yahoo.com</span>
+    </div>
+  </div>
+</div>
+
 <!-- Template for Dynamic Result Cards -->
 <template id="result-card-template">
   <div class="result-card">
-    <div class="result-map-preview" aria-label="Cemetery map preview">
-      <img src="../assets/garden_of_memories_traffic_flow%20-%20Copy.svg" alt="Garden of Memories Memorial Park traffic flow map">
-    </div>
     <div class="result-info">
       <div class="result-icon" aria-hidden="true">
         <img src="../assets/logo.png" alt="">
@@ -74,7 +95,6 @@
   </div>
 </template>
 
-<!-- Cemetery map -->
 <div id="map-modal" class="map-overlay" aria-hidden="true">
   <section class="map-dialog" role="dialog" aria-modal="true" aria-labelledby="map-person-name">
     <div class="map-toolbar">
@@ -85,13 +105,10 @@
       </div>
       <button type="button" id="map-close" class="map-close" aria-label="Close map">&times;</button>
     </div>
-    <div id="cemetery-map" class="cemetery-map">
-      <div class="map-loading">Loading cemetery map…</div>
+    <div class="cemetery-map">
+      <img class="cemetery-map-image" src="../assets/garden_of_memories_traffic_flow%20-%20Copy.svg" alt="Garden of Memories Memorial Park traffic flow map">
     </div>
-    <div class="map-footer">
-      <span>Traffic flow map</span>
-      <span class="map-tip">Drag to pan · Use controls or pinch to zoom</span>
-    </div>
+    <div class="map-footer">Traffic flow map</div>
   </section>
 </div>
 
@@ -100,42 +117,6 @@
     <span>© 2025 Garden of Memories Memorial Park & Chapels Inc. All rights reserved.</span>
   </div>
 </footer>
-
-<!-- Filter Modal -->
-<div id="filter-modal" class="modal-overlay" onclick="closeModal(event, 'filter-modal')">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'filter-modal')">✕</button>
-    <p class="section-tag" style="justify-content:flex-start;">Refine your search</p>
-    <h2 class="section-title" style="margin-top:0; font-size: 2.2rem;">Filter <em>Results</em></h2>
-    <div class="gold-bar"></div>
-    
-    <form id="filter-results-form" class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;">
-      <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-        <div class="field-group" style="flex: 1;">
-          <label class="field-label">Section</label>
-          <select class="field-select">
-            <option value="all">All Sections</option>
-            <option value="A">Section A</option>
-            <option value="B">Section B</option>
-            <option value="C">Section C</option>
-            <option value="D">Section D</option>
-          </select>
-        </div>
-        <div class="field-group" style="flex: 1;">
-          <label class="field-label">Year of Death</label>
-          <select class="field-select">
-            <option value="all">Any Year</option>
-            <option value="2020s">2020 - Present</option>
-            <option value="2010s">2010 - 2019</option>
-            <option value="2000s">2000 - 2009</option>
-            <option value="older">Before 2000</option>
-          </select>
-        </div>
-      </div>
-      <button type="submit" class="submit-btn" style="margin-top: 1rem;">Apply Filters</button>
-    </form>
-  </div>
-</div>
 
 <!-- Linking to the standalone JS file -->
 <script src="visitors javascripts/results.js"></script>

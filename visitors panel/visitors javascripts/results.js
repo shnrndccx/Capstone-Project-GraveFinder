@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   protectPage();
 
-  // 1. Grab the URL parameters sent by the index.html form
+  // 1. Grab the URL parameters sent by the homepage.html form
   const params = new URLSearchParams(window.location.search);
   const firstName = params.get('firstName') || '';
   const middleName = params.get('middleName') || '';
@@ -194,13 +194,12 @@ document.addEventListener('DOMContentLoaded', () => {
       clone.querySelector('.died-detail').textContent = `Died: ${person.died}`;
       clone.querySelector('.location-detail').textContent = `Location: ${person.location}`;
       clone.querySelector('.locate-btn').addEventListener('click', () => openCemeteryMap(person));
-      
       resultsList.appendChild(clone);
     });
   }
 
   // Timer Notification Countdown
-  let timeLeft = 15;
+  let timeLeft = 60;
   const noticeText = document.getElementById('privacy-notice-text');
   if (noticeText) {
     noticeText.innerHTML = `<strong>Privacy Notice:</strong> For the privacy of families, personal details will be blurred after ${timeLeft} seconds.`;
@@ -216,142 +215,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 1000);
 
-  // Timer: Blur the details after 15 seconds (15000 milliseconds)
+  // Timer: Blur the details after 60 seconds (60000 milliseconds)
   setTimeout(() => {
     blurPrivateDetails();
-  }, 15000);
+  }, 60000);
 
   const mapModal = document.getElementById('map-modal');
-  const mapHost = document.getElementById('cemetery-map');
+  const mapClose = document.getElementById('map-close');
+  const mapPersonName = document.getElementById('map-person-name');
+  const mapLocationLabel = document.getElementById('map-location-label');
 
   function openCemeteryMap(person) {
-    document.getElementById('map-person-name').textContent = person.name;
-    document.getElementById('map-location-label').textContent = person.location;
+    mapPersonName.textContent = person.name;
+    mapLocationLabel.textContent = person.location;
     mapModal.classList.add('is-open');
     mapModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    mapHost.innerHTML = `
-      <img class="cemetery-map-image" src="../assets/garden_of_memories_traffic_flow%20-%20Copy.svg" alt="Garden of Memories Memorial Park traffic flow map">
-      <div class="map-location-badge">${person.location}</div>
-      <div class="map-controls">
-        <button type="button" data-map-zoom="1.25" aria-label="Zoom in">+</button>
-        <button type="button" data-map-zoom="0.8" aria-label="Zoom out">−</button>
-        <button type="button" data-map-reset aria-label="Reset map">⌂</button>
-      </div>
-    `;
-    setupImageMapControls();
   }
 
-  function closeCemeteryMap() { mapModal.classList.remove('is-open'); mapModal.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
-  document.getElementById('map-close').addEventListener('click', closeCemeteryMap);
-  mapModal.addEventListener('click', e => { if (e.target === mapModal) closeCemeteryMap(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCemeteryMap(); });
-
-  function setupImageMapControls() {
-    const image = mapHost.querySelector('.cemetery-map-image');
-    if (!image) return;
-
-    let scale = 1;
-    let offsetX = 0;
-    let offsetY = 0;
-    let dragStart;
-    let pinchStart;
-
-    const applyTransform = () => {
-      image.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
-    };
-
-    const setScale = nextScale => {
-      scale = Math.max(1, Math.min(5, nextScale));
-      applyTransform();
-    };
-
-    mapHost.querySelectorAll('[data-map-zoom]').forEach(button => {
-      button.addEventListener('click', () => setScale(scale * Number(button.dataset.mapZoom)));
-    });
-
-    mapHost.querySelector('[data-map-reset]').addEventListener('click', () => {
-      scale = 1;
-      offsetX = 0;
-      offsetY = 0;
-      applyTransform();
-    });
-
-    mapHost.addEventListener('pointerdown', event => {
-      if (event.target.closest('.map-controls')) return;
-      dragStart = { x: event.clientX, y: event.clientY, offsetX, offsetY };
-      mapHost.setPointerCapture(event.pointerId);
-      mapHost.classList.add('is-dragging');
-    });
-
-    mapHost.addEventListener('pointermove', event => {
-      if (!dragStart) return;
-      offsetX = dragStart.offsetX + event.clientX - dragStart.x;
-      offsetY = dragStart.offsetY + event.clientY - dragStart.y;
-      applyTransform();
-    });
-
-    const stopDragging = event => {
-      if (dragStart && mapHost.hasPointerCapture(event.pointerId)) {
-        mapHost.releasePointerCapture(event.pointerId);
-      }
-      dragStart = null;
-      mapHost.classList.remove('is-dragging');
-    };
-
-    mapHost.addEventListener('pointerup', stopDragging);
-    mapHost.addEventListener('pointercancel', stopDragging);
-
-    mapHost.addEventListener('wheel', event => {
-      event.preventDefault();
-      setScale(scale * (event.deltaY < 0 ? 1.15 : 0.87));
-    }, { passive: false });
-
-    mapHost.addEventListener('touchstart', event => {
-      if (event.touches.length !== 2) return;
-      const first = event.touches[0];
-      const second = event.touches[1];
-      pinchStart = {
-        distance: Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY),
-        scale
-      };
-    }, { passive: true });
-
-    mapHost.addEventListener('touchmove', event => {
-      if (!pinchStart || event.touches.length !== 2) return;
-      event.preventDefault();
-      const first = event.touches[0];
-      const second = event.touches[1];
-      const distance = Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY);
-      setScale(pinchStart.scale * distance / pinchStart.distance);
-    }, { passive: false });
-
-    mapHost.addEventListener('touchend', () => { pinchStart = null; }, { passive: true });
+  function closeCemeteryMap() {
+    mapModal.classList.remove('is-open');
+    mapModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
   }
 
-  function renderMap(buildings, frame, person, host = mapHost, showControls = true) {
-    const all = [...buildings.features, ...frame.features];
-    const points = [];
-    const walk = value => Array.isArray(value?.[0]) ? value.forEach(walk) : points.push(value);
-    all.forEach(f => walk(f.geometry.coordinates));
-    const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
-    const bounds = { minX:Math.min(...xs), maxX:Math.max(...xs), minY:Math.min(...ys), maxY:Math.max(...ys) };
-    const pad = 12, width=bounds.maxX-bounds.minX+pad*2, height=bounds.maxY-bounds.minY+pad*2;
-    const pathFor = coords => { const rings=[]; const ringWalk = a => Array.isArray(a?.[0]?.[0]) ? a.forEach(ringWalk) : rings.push(a); ringWalk(coords); return rings.map(r => r.map((p,i) => `${i?'L':'M'}${p[0]-bounds.minX+pad},${bounds.maxY-p[1]+pad}`).join(' ')+' Z').join(' '); };
-    const hash=[...person.location].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,7);
-    const candidates=buildings.features.filter(f=>f.geometry.coordinates);
-    const target=candidates[hash%candidates.length]; const tp=[]; const collect=a=>Array.isArray(a?.[0])?a.forEach(collect):tp.push(a); collect(target.geometry.coordinates);
-    const px=tp.reduce((s,p)=>s+p[0],0)/tp.length-bounds.minX+pad, py=bounds.maxY-tp.reduce((s,p)=>s+p[1],0)/tp.length+pad;
-    host.innerHTML=`<svg viewBox="0 0 ${width} ${height}" aria-label="Map showing ${person.location}"><g class="map-world">${buildings.features.map(f=>`<path class="map-building" d="${pathFor(f.geometry.coordinates)}"/>`).join('')}${frame.features.map(f=>`<path class="map-frame" d="${pathFor(f.geometry.coordinates)}"/>`).join('')}<circle class="map-pin-pulse" cx="${px}" cy="${py}" r="7"/><circle class="map-pin" cx="${px}" cy="${py}" r="6"/></g></svg>${showControls ? '<div class="map-controls"><button data-zoom="1.25" aria-label="Zoom in">+</button><button data-zoom="0.8" aria-label="Zoom out">−</button><button data-reset aria-label="Reset map">⌂</button></div>' : ''}`;
-    const world=host.querySelector('.map-world'); let scale=1, tx=0, ty=0, drag;
-    const apply=()=>world.setAttribute('transform',`translate(${tx} ${ty}) scale(${scale})`);
-    host.querySelectorAll('[data-zoom]').forEach(b=>b.onclick=()=>{scale=Math.max(.7,Math.min(8,scale*+b.dataset.zoom));apply();});
-    const resetButton = host.querySelector('[data-reset]');
-    if (resetButton) resetButton.onclick=()=>{scale=1;tx=ty=0;apply();};
-    host.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY,tx,ty};host.setPointerCapture(e.pointerId);host.classList.add('is-dragging');};
-    host.onpointermove=e=>{if(!drag)return; const vb=width/host.clientWidth;tx=drag.tx+(e.clientX-drag.x)*vb/scale;ty=drag.ty+(e.clientY-drag.y)*vb/scale;apply();};
-    host.onpointerup=()=>{drag=null;host.classList.remove('is-dragging');};
-    host.onwheel=e=>{e.preventDefault();scale=Math.max(.7,Math.min(8,scale*(e.deltaY<0?1.15:.87)));apply();};
-  }
+  mapClose.addEventListener('click', closeCemeteryMap);
+  mapModal.addEventListener('click', event => {
+    if (event.target === mapModal) closeCemeteryMap();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeCemeteryMap();
+  });
 
 });
