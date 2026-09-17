@@ -20,16 +20,17 @@
     <h1 class="login-title">Admin Panel</h1>
     <p class="login-sub">Please enter your credentials to access the dashboard.</p>
 
-    <!-- The form action will redirect to the dashboard. In a real app, this would be handled by a server. -->
-    <form class="contact-form" action="admin.html" style="padding:0; border:none; box-shadow:none; background:transparent; margin-top: 2.5rem;">
+    <!-- Credentials are checked client-side against the admin roster in js/admin-auth.js. -->
+    <form id="admin-login-form" class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent; margin-top: 2.5rem;">
       <div class="field-group">
         <label class="field-label">Email Address</label>
-        <input class="field-input" type="email" value="admin@gardenofmemories.com" required>
+        <input class="field-input" id="login-email" type="email" placeholder="e.g. super.admin@gardenofmemories.com" required>
       </div>
       <div class="field-group">
         <label class="field-label">Password</label>
-        <input class="field-input" type="password" value="password" required>
+        <input class="field-input" id="login-password" type="password" required>
       </div>
+      <p id="login-error" class="field-error-text" style="text-align:center; font-size: 0.8rem;"></p>
       <button type="submit" class="submit-btn" style="width: 100%; margin-top: 1rem;">Log In</button>
     </form>
 
@@ -42,5 +43,37 @@
   </div> 
 </div>
 
+<script src="js/admin-auth.js"></script>
+<script>
+  document.getElementById('admin-login-form').addEventListener('submit', event => {
+    event.preventDefault();
+
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const password = document.getElementById('login-password').value;
+    const errorText = document.getElementById('login-error');
+
+    const admin = getAdmins().find(item => item.email.toLowerCase() === email && item.password === password);
+
+    if (!admin) {
+      errorText.innerText = 'Incorrect email or password.';
+      return;
+    }
+
+    if (admin.status !== 'Active') {
+      errorText.innerText = 'This admin account has been deactivated.';
+      return;
+    }
+
+    setCurrentAdmin(admin);
+
+    const roleHome = {
+      super_admin: 'super admin/admin-super.html',
+      mid_admin: 'mid admin/admin-mid.html',
+      low_admin: 'low admin/admin-low.html'
+    };
+
+    window.location.href = roleHome[admin.role] || 'admin.html';
+  });
+</script>
 </body>
 </html>

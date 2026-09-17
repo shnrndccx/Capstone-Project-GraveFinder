@@ -2,19 +2,19 @@ const RECORDS_KEY = 'graveFinderRecords';
 
 // Initial records used only when there is no saved data in localStorage yet.
 const defaultRecords = [
-  { id: 1001, name: 'Maria Santos', birthDate: '1945-01-15', deathDate: '2020-12-12', location: 'Section D, Plot 12' },
-  { id: 1002, name: 'Juan Manuel Dela Cruz', birthDate: '1950-02-20', deathDate: '2018-11-01', location: 'Section A, Plot 8' },
-  { id: 1003, name: 'Elena Rosales Villanueva', birthDate: '1938-03-08', deathDate: '2015-06-15', location: 'Section B, Plot 24' },
-  { id: 1004, name: 'Roberto Garcia Reyes', birthDate: '1960-04-12', deathDate: '2021-08-22', location: 'Section C, Plot 5' },
-  { id: 1005, name: 'Carmen Mendoza Flores', birthDate: '1942-05-30', deathDate: '2019-09-10', location: 'Section D, Plot 18' },
-  { id: 1006, name: 'Ricardo Castro Cruz', birthDate: '1955-06-25', deathDate: '2022-07-04', location: 'Section E, Plot 33' },
-  { id: 1007, name: 'Teresita Bautista Perez', birthDate: '1948-07-18', deathDate: '2017-10-31', location: 'Section F, Plot 11' },
-  { id: 1008, name: 'Eduardo Navarro Gomez', birthDate: '1935-08-05', deathDate: '2010-01-14', location: 'Section G, Plot 42' },
-  { id: 1009, name: 'Josefina Ramos Ramos', birthDate: '1952-09-14', deathDate: '2020-03-08', location: 'Section H, Plot 7' },
-  { id: 1010, name: 'Antonio Diaz Aquino', birthDate: '1940-10-02', deathDate: '2016-12-25', location: 'Section I, Plot 19' },
-  { id: 1011, name: 'Lourdes Tolentino Cortez', birthDate: '1947-11-22', deathDate: '2014-02-18', location: 'Section J, Plot 2' },
-  { id: 1012, name: 'Fernando De Leon Santos', birthDate: '1965-12-09', deathDate: '2023-04-05', location: 'Section A, Plot 55' },
-  { id: 1013, name: 'Sol Martinez Alvarez', birthDate: '1955-03-10', deathDate: '2021-07-22', location: 'Section B, Plot 14' }
+  { id: 1001, name: 'Maria Santos', birthDate: '1945-01-15', deathDate: '2020-12-12', location: 'Section D, Plot 12', status: 'active' },
+  { id: 1002, name: 'Juan Manuel Dela Cruz', birthDate: '1950-02-20', deathDate: '2018-11-01', location: 'Section A, Plot 8', status: 'active' },
+  { id: 1003, name: 'Elena Rosales Villanueva', birthDate: '1938-03-08', deathDate: '2015-06-15', location: 'Section B, Plot 24', status: 'active' },
+  { id: 1004, name: 'Roberto Garcia Reyes', birthDate: '1960-04-12', deathDate: '2021-08-22', location: 'Section C, Plot 5', status: 'active' },
+  { id: 1005, name: 'Carmen Mendoza Flores', birthDate: '1942-05-30', deathDate: '2019-09-10', location: 'Section D, Plot 18', status: 'active' },
+  { id: 1006, name: 'Ricardo Castro Cruz', birthDate: '1955-06-25', deathDate: '2022-07-04', location: 'Section E, Plot 33', status: 'active' },
+  { id: 1007, name: 'Teresita Bautista Perez', birthDate: '1948-07-18', deathDate: '2017-10-31', location: 'Section F, Plot 11', status: 'active' },
+  { id: 1008, name: 'Eduardo Navarro Gomez', birthDate: '1935-08-05', deathDate: '2010-01-14', location: 'Section G, Plot 42', status: 'active' },
+  { id: 1009, name: 'Josefina Ramos Ramos', birthDate: '1952-09-14', deathDate: '2020-03-08', location: 'Section H, Plot 7', status: 'active' },
+  { id: 1010, name: 'Antonio Diaz Aquino', birthDate: '1940-10-02', deathDate: '2016-12-25', location: 'Section I, Plot 19', status: 'active' },
+  { id: 1011, name: 'Lourdes Tolentino Cortez', birthDate: '1947-11-22', deathDate: '2014-02-18', location: 'Section J, Plot 2', status: 'active' },
+  { id: 1012, name: 'Fernando De Leon Santos', birthDate: '1965-12-09', deathDate: '2023-04-05', location: 'Section A, Plot 55', status: 'active' },
+  { id: 1013, name: 'Sol Martinez Alvarez', birthDate: '1955-03-10', deathDate: '2021-07-22', location: 'Section B, Plot 14', status: 'active' }
 ];
 
 let editingRecordId = null;
@@ -38,6 +38,15 @@ function getRecords() {
 // Saves the latest records so admin changes remain after page refresh.
 function saveRecords(records) {
   localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
+}
+
+// Convenience helpers for filtering by status.
+function getActiveRecords() {
+  return getRecords().filter(record => record.status !== 'archived');
+}
+
+function getArchivedRecords() {
+  return getRecords().filter(record => record.status === 'archived');
 }
 
 // Converts date input values into readable dates for the admin tables.
@@ -72,18 +81,27 @@ function getRecordFormValues(form) {
   };
 }
 
-// Renders either all records or dashboard recent records depending on the table.
+// Renders active, recent, or archived records depending on which table is on the page.
 function renderRecords() {
   const table = document.querySelector('[data-records-table]');
   if (!table) return;
 
-  const records = getRecords();
+  const tableType = table.dataset.recordsTable;
   const tbody = table.querySelector('tbody');
-  const isDashboard = table.dataset.recordsTable === 'recent';
-  const visibleRecords = isDashboard ? records.slice(-7).reverse() : records;
+  const canManage = hasPermission('records.add') || hasPermission('records.edit');
+  const canPermanentDelete = hasPermission('records.permanentDelete');
+
+  let visibleRecords;
+  if (tableType === 'recent') {
+    visibleRecords = getActiveRecords().slice(-7).reverse();
+  } else if (tableType === 'archived') {
+    visibleRecords = getArchivedRecords();
+  } else {
+    visibleRecords = getActiveRecords();
+  }
 
   tbody.innerHTML = visibleRecords.map(record => {
-    const cells = isDashboard
+    const cells = tableType === 'recent'
       ? `
         <td>${record.name}</td>
         <td>${formatDate(record.birthDate)}</td>
@@ -98,19 +116,28 @@ function renderRecords() {
         <td>${record.location}</td>
       `;
 
+    let actions = '';
+    if (tableType === 'archived') {
+      if (canManage) actions += `<button class="action-btn" type="button" onclick="restoreRecord(${record.id})">Restore</button>`;
+      if (canPermanentDelete) actions += `<button class="action-btn delete" type="button" onclick="permanentlyDeleteRecord(${record.id})">Delete Permanently</button>`;
+    } else if (tableType !== 'recent') {
+      if (canManage) {
+        actions += `<button class="action-btn" type="button" onclick="startEditRecord(${record.id})">Edit</button>`;
+        actions += `<button class="action-btn delete" type="button" onclick="archiveRecord(${record.id})">Archive</button>`;
+      }
+      if (canPermanentDelete) actions += `<button class="action-btn delete" type="button" onclick="permanentlyDeleteRecord(${record.id})">Delete</button>`;
+    }
+
     return `
       <tr data-record-id="${record.id}">
         ${cells}
-        <td>
-          <button class="action-btn" type="button" onclick="startEditRecord(${record.id})">Edit</button>
-          <button class="action-btn delete" type="button" onclick="deleteRecord(${record.id})">Delete</button>
-        </td>
+        ${tableType === 'recent' ? '' : `<td>${actions}</td>`}
       </tr>
     `;
   }).join('');
 
   const totalValue = document.querySelector('[data-stat="total-records"]');
-  if (totalValue) totalValue.textContent = records.length.toLocaleString();
+  if (totalValue) totalValue.textContent = getActiveRecords().length.toLocaleString();
 }
 
 // Opens the edit modal and fills it with the selected record's data.
@@ -127,14 +154,45 @@ function startEditRecord(id) {
   openModal('edit-record-modal');
 }
 
-// Deletes one record from storage and refreshes the table.
-function deleteRecord(id) {
-  if (!confirm('Are you sure you want to delete this record?')) return;
+// Archives a record instead of deleting it outright; it stays in the database.
+function archiveRecord(id) {
+  if (!confirm('Are you sure you want to archive this record?')) return;
 
-  const records = getRecords().filter(record => record.id !== id);
-  saveRecords(records);
+  const records = getRecords();
+  const record = records.find(item => item.id === id);
+  if (!record) return;
+
+  saveRecords(records.map(item => (item.id === id ? { ...item, status: 'archived' } : item)));
+  logActivity('Archived', record.name, `Record #${id} moved to Archived Records.`);
   renderRecords();
-  showAdminMessage('Record deleted successfully!');
+  showAdminMessage('Record archived successfully!');
+}
+
+// Restores an archived record back to the active list.
+function restoreRecord(id) {
+  const records = getRecords();
+  const record = records.find(item => item.id === id);
+  if (!record) return;
+
+  saveRecords(records.map(item => (item.id === id ? { ...item, status: 'active' } : item)));
+  logActivity('Restored', record.name, `Record #${id} restored to Grave Records.`);
+  renderRecords();
+  showAdminMessage('Record restored successfully!');
+}
+
+// Permanently removes a record from the database. Cannot be undone.
+function permanentlyDeleteRecord(id) {
+  if (!hasPermission('records.permanentDelete')) return;
+  if (!confirm('This will permanently delete the record. This action cannot be undone. Continue?')) return;
+
+  const records = getRecords();
+  const record = records.find(item => item.id === id);
+  if (!record) return;
+
+  saveRecords(records.filter(item => item.id !== id));
+  logActivity('Permanently Deleted', record.name, `Record #${id} was permanently removed.`);
+  renderRecords();
+  showAdminMessage('Record permanently deleted.');
 }
 
 // Connects add/edit form submissions to the localStorage CRUD behavior.
@@ -149,11 +207,13 @@ function setupRecordForms() {
 
       const records = getRecords();
       const nextId = records.length ? Math.max(...records.map(record => record.id)) + 1 : 1001;
-      records.push({ id: nextId, ...getRecordFormValues(addForm) });
+      const values = getRecordFormValues(addForm);
+      records.push({ id: nextId, ...values, status: 'active' });
       saveRecords(records);
       addForm.reset();
       closeModal(event, 'add-record-modal');
       renderRecords();
+      logActivity('Created', values.name, `New record #${nextId} added.`);
       showAdminMessage('Record added successfully!');
     }, true);
   }
@@ -163,12 +223,14 @@ function setupRecordForms() {
       event.preventDefault();
       event.stopImmediatePropagation();
 
+      const values = getRecordFormValues(editForm);
       const records = getRecords().map(record => (
-        record.id === editingRecordId ? { ...record, ...getRecordFormValues(editForm) } : record
+        record.id === editingRecordId ? { ...record, ...values } : record
       ));
       saveRecords(records);
       closeModal(event, 'edit-record-modal');
       renderRecords();
+      logActivity('Updated', values.name, `Record #${editingRecordId} details updated.`);
       showAdminMessage('Record updated successfully!');
     }, true);
   }

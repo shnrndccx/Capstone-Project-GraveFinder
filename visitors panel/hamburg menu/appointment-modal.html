@@ -1,0 +1,53 @@
+<div id="appointment-modal" class="modal-overlay" onclick="closeModal(event, 'appointment-modal')">
+  <div class="modal-content appointment-modal-content" onclick="event.stopPropagation()" style="max-width: 620px;">
+    <button class="modal-close" aria-label="Close Appointment Information" onclick="closeModal(event, 'appointment-modal')">✕</button>
+    <p class="section-tag" style="justify-content:flex-start;">Memorial Services</p>
+    <h2 class="section-title" style="margin-top:0; font-size: 2.2rem;">Book an <em>Appointment</em></h2>
+    <div class="gold-bar"></div>
+    <p class="section-body">Choose your preferred date and time, then provide the details of the appointment request.</p>
+    <form id="appointment-form" class="contact-form appointment-form" novalidate onsubmit="submitAppointment(event)">
+      <div class="appointment-form-grid">
+        <div class="field-group">
+          <label class="field-label field-label-required" for="appointment-name">Full Name <span aria-hidden="true">*</span></label>
+          <input class="field-input letters-only" id="appointment-name" name="appointmentName" type="text" required placeholder="e.g. Maria Santos">
+        </div>
+        <div class="field-group">
+          <label class="field-label field-label-required" for="appointment-contact">Contact Number <span aria-hidden="true">*</span></label>
+          <input class="field-input numbers-only" id="appointment-contact" name="appointmentContact" type="text" inputmode="tel" required placeholder="e.g. 09602315608 or +639602315608">
+          <small class="field-error-text" id="appointment-contact-error"></small>
+        </div>
+        <div class="field-group">
+          <label class="field-label field-label-required" for="appointment-email">Email <span aria-hidden="true">*</span></label>
+          <input class="field-input" id="appointment-email" name="appointmentEmail" type="email" required placeholder="e.g. maria.santos@gmail.com">
+          <small class="field-error-text" id="appointment-email-error"></small>
+        </div>
+        <div class="field-group">
+          <label class="field-label field-label-required" for="appointment-date">Appointment Date <span aria-hidden="true">*</span></label>
+          <input class="field-input" id="appointment-date" name="appointmentDate" type="date" required>
+          <small id="appointment-date-help" class="appointment-field-help"></small>
+        </div>
+        <div class="field-group">
+          <label class="field-label field-label-required" for="appointment-time">Appointment Time <span aria-hidden="true">*</span></label>
+          <input class="field-input" id="appointment-time" name="appointmentTime" type="time" min="08:00" max="17:00" required oninput="validateAppointmentTime(this)" onchange="validateAppointmentTime(this)">
+          <small class="appointment-field-help">Available from 8:00 AM to 5:00 PM.</small>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label field-label-required" for="appointment-type">Appointment For <span aria-hidden="true">*</span></label>
+        <select class="field-select" id="appointment-type" name="appointmentType" required>
+          <option value="" selected disabled>Select appointment purpose...</option>
+          <option>Memorial service inquiry</option>
+          <option>Interment inquiry</option>
+          <option>Grave or niche inquiry</option>
+          <option>Document or records inquiry</option>
+          <option>Other assistance</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label field-label-required" for="appointment-details">Appointment Details <span aria-hidden="true">*</span></label>
+        <textarea class="field-input" id="appointment-details" name="appointmentDetails" required placeholder="Please describe the purpose of the appointment."></textarea>
+      </div>
+      <button type="submit" class="staff-contact-button appointment-submit-button">Request Appointment</button>
+    </form>
+  </div>
+</div>

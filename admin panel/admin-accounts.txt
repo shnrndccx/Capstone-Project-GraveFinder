@@ -1,0 +1,22 @@
+Admin Panel Login Accounts
+===========================
+
+Super Admin
+  Email:    super.admin@gardenofmemories.com
+  Password: SuperAdmin123
+
+Mid Admin (1)
+  Email:    mid.admin1@gardenofmemories.com
+  Password: MidAdmin123
+
+Mid Admin (2)
+  Email:    mid.admin2@gardenofmemories.com
+  Password: MidAdmin456
+
+Low Admin (1)
+  Email:    low.admin1@gardenofmemories.com
+  Password: LowAdmin123
+
+Low Admin (2)
+  Email:    low.admin2@gardenofmemories.com
+  Password: LowAdmin456

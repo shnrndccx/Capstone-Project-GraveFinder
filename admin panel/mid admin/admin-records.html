@@ -3,78 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard — Garden of Memories</title>
+<title>Grave Records — Admin Panel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
-<!-- Link to main and admin specific stylesheets -->
-<link rel="stylesheet" href="../visitors panel/visitors css/style.css">
-<link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="../../visitors panel/visitors css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
 </head>
-<body>
+<body data-requires-role="mid_admin" data-home="../admin-login.html">
 
-<!-- NAV -->
 <nav>
   <div class="nav-logo" aria-label="Garden of Memories Memorial Park">
-    <img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
+    <img src="../../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
     <div class="nav-brand-text">
       <span class="brand-main">Garden of Memories Memorial Park</span>
       <span class="brand-sub">Admin Panel</span>
     </div>
   </div>
-  <a href="admin-login.html" class="nav-cta" style="text-decoration: none;">Log Out</a>
+  <a href="../admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration: none;">Log Out</a>
 </nav>
 
 <div class="admin-wrapper">
-  <!-- SIDEBAR -->
   <aside class="admin-sidebar">
     <ul class="sidebar-menu">
-      <li><a href="admin.html" class="active">Dashboard Overview</a></li>
-      <li><a href="admin-records.html">Grave Records</a></li>
+      <li><a href="admin-mid.html">Mid Admin Dashboard</a></li>
+      <li><a href="admin-records.html" class="active">Grave Records</a></li>
+      <li><a href="admin-archived.html">Archived Records</a></li>
       <li><a href="admin-appointments.html">Appointments</a></li>
-      <li><a href="admin-inquiries.html">Inquiries & Messages</a></li>
-      <li><a href="admin-settings.html">System Settings</a></li>
+      <li><a href="admin-activity.html">Activity History</a></li>
     </ul>
   </aside>
 
-  <!-- MAIN CONTENT -->
   <main class="admin-content">
     <div class="admin-header">
       <div>
-        <p class="section-tag" style="justify-content:flex-start;">Overview</p>
-        <h1 class="section-title" style="margin-top:0; margin-bottom:0;">Welcome, <em>Admin</em></h1>
+        <p class="section-tag" style="justify-content:flex-start;">Database Management</p>
+        <h1 class="section-title" style="margin-top:0; margin-bottom:0;">Grave <em>Records</em></h1>
       </div>
-      <button class="admin-primary-btn" onclick="openModal('add-record-modal')">+ Add New Record</button>
+      <button class="admin-primary-btn" data-permission="records.add" onclick="openModal('add-record-modal')">+ Add New Record</button>
     </div>
 
-    <!-- STATISTICS -->
-    <div class="stat-grid">
-      <div class="stat-card">
-        <h3>Total Grave Records</h3>
-        <div class="stat-value" data-stat="total-records">0</div>
+    <div class="search-box" style="margin-bottom: 2rem; padding: 1.5rem; animation: none; opacity: 1;">
+      <div class="field-group">
+        <label class="field-label">Search Records</label>
+        <input id="record-search-input" class="field-input" type="text" placeholder="Search by name, section, or plot...">
       </div>
-      <div class="stat-card">
-        <h3>Pending Appointments</h3>
-        <div class="stat-value">14</div>
-      </div>
-      <div class="stat-card">
-        <h3>Unread Messages</h3>
-        <div class="stat-value">5</div>
-      </div>
-      <div class="stat-card">
-        <h3>Searches Today</h3>
-        <div class="stat-value">86</div>
-      </div>
+      <button class="admin-primary-btn" onclick="filterRecords()">Filter</button>
     </div>
 
-    <!-- RECENT RECORDS TABLE -->
-    <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; margin-bottom: 1rem; color: var(--deep);">Recent Grave Records</h2>
     <div class="admin-table-container">
-      <table class="admin-table" data-records-table="recent">
+      <table class="admin-table" data-records-table="all">
         <thead>
           <tr>
+            <th>ID</th>
             <th>Full Name</th>
-            <th>Born</th>
-            <th>Died</th>
+            <th>Date of Birth</th>
+            <th>Date of Death</th>
             <th>Location</th>
             <th>Actions</th>
           </tr>
@@ -162,7 +145,8 @@
   </div>
 </div>
 
-<script src="../visitors panel/visitors javascripts/script.js"></script>
-<script src="js/admin-crud.js"></script>
+<script src="../../visitors panel/visitors javascripts/script.js"></script>
+<script src="../js/admin-auth.js"></script>
+<script src="../js/admin-crud.js"></script>
 </body>
 </html>

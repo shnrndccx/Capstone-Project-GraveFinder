@@ -6,29 +6,31 @@
 <title>Settings — Admin Panel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../visitors panel/visitors css/style.css">
-<link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="../../visitors panel/visitors css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
 </head>
-<body>
+<body data-requires-role="super_admin" data-home="../admin-login.html">
 
 <nav>
   <div class="nav-logo" aria-label="Garden of Memories Memorial Park">
-    <img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
+    <img src="../../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
     <div class="nav-brand-text">
       <span class="brand-main">Garden of Memories Memorial Park</span>
       <span class="brand-sub">Admin Panel</span>
     </div>
   </div>
-  <a href="admin-login.html" class="nav-cta" style="text-decoration: none;">Log Out</a>
+  <a href="../admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration: none;">Log Out</a>
 </nav>
 
 <div class="admin-wrapper">
   <aside class="admin-sidebar">
     <ul class="sidebar-menu">
-      <li><a href="admin.html">Dashboard Overview</a></li>
+      <li><a href="admin-super.html">Super Admin Dashboard</a></li>
       <li><a href="admin-records.html">Grave Records</a></li>
+      <li><a href="admin-archived.html">Archived Records</a></li>
       <li><a href="admin-appointments.html">Appointments</a></li>
-      <li><a href="admin-inquiries.html">Inquiries & Messages</a></li>
+      <li><a href="admin-activity.html">Activity History</a></li>
+      <li><a href="admin-manage.html">Manage Admins</a></li>
       <li><a href="admin-settings.html" class="active">System Settings</a></li>
     </ul>
   </aside>
@@ -88,7 +90,8 @@
     </div>
   </main>
 </div>
-<script src="../visitors panel/visitors javascripts/script.js"></script>
-<script src="js/admin-pages.js"></script>
+<script src="../../visitors panel/visitors javascripts/script.js"></script>
+<script src="../js/admin-auth.js"></script>
+<script src="../js/admin-pages.js"></script>
 </body>
 </html>

@@ -237,68 +237,6 @@ nav {
 }
 .nav-cta:hover { background: var(--sage-dark); color: var(--ivory); }
 
-.hamburger-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  transition: transform 0.3s;
-}
-.hamburger-btn:hover {
-  transform: scale(1.1);
-}
-.nav-menu-container {
-  position: relative;
-}
-.nav-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 1.5rem;
-  background: rgba(253, 252, 249, 0.98);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(77,131,168,0.28);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-  border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding: 1rem;
-  min-width: 180px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px);
-  transition: all 0.3s ease;
-}
-.nav-dropdown.active {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-.dropdown-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  border: none;
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--charcoal);
-  padding: 0.8rem 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-radius: 4px;
-  text-decoration: none;
-}
-.dropdown-item:hover { background: rgba(77,131,168,0.12); color: var(--sage-dark); }
-.dropdown-divider { height: 1px; background: rgba(77,131,168,0.28); margin: 0.4rem 0; }
-
 /* ─── HERO ─── */
 .hero {
   min-height: 100vh;
@@ -433,6 +371,16 @@ nav {
 }
 .field-input::placeholder { color: var(--stone); opacity: 0.7; }
 .field-input:focus { border-color: var(--sage); }
+.field-input.input-invalid { border-color: #a54c4c; }
+.field-input.input-invalid:focus { border-color: #a54c4c; }
+.field-error-text {
+  display: block;
+  margin-top: 0.3rem;
+  color: #a54c4c;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  min-height: 1em;
+}
 
 .field-select {
   -webkit-appearance: none;
@@ -610,14 +558,6 @@ nav {
     font-size: 0.62rem;
   }
 
-  .nav-dropdown {
-    position: fixed;
-    top: 68px;
-    right: 1rem;
-    left: 1rem;
-    width: auto;
-  }
-
   .hero {
     min-height: auto;
     padding: 8.5rem 1rem 3rem;
@@ -706,10 +646,6 @@ nav {
   .brand-sub {
     font-size: 0.55rem;
     letter-spacing: 0.14em;
-  }
-
-  .hamburger-btn {
-    padding: 0.35rem;
   }
 
   .hero {

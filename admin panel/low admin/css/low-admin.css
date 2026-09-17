@@ -1,0 +1,42 @@
+/* ─── LOW ADMIN DASHBOARD ─── */
+.power-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.power-card {
+  background: var(--ivory);
+  border: 1px solid rgba(34,54,47,0.1);
+  border-left: 3px solid var(--gold);
+  padding: 1.35rem 1.45rem;
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(34,54,47,0.05);
+}
+
+.power-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  color: var(--deep);
+  margin-bottom: 0.4rem;
+}
+
+.power-card p {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--charcoal);
+  margin: 0;
+}
+
+.power-card.restricted {
+  border-left-color: #a35d5d;
+  opacity: 0.65;
+}
+
+@media (max-width: 600px) {
+  .power-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}

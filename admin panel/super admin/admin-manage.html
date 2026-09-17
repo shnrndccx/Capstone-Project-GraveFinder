@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Admins — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../visitors panel/visitors css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body data-requires-role="super_admin" data-home="../admin-login.html">
+
+<nav>
+  <div class="nav-logo" aria-label="Garden of Memories Memorial Park">
+    <img src="../../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
+    <div class="nav-brand-text">
+      <span class="brand-main">Garden of Memories Memorial Park</span>
+      <span class="brand-sub">Admin Panel</span>
+    </div>
+  </div>
+  <a href="../admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration: none;">Log Out</a>
+</nav>
+
+<div class="admin-wrapper">
+  <aside class="admin-sidebar">
+    <ul class="sidebar-menu">
+      <li><a href="admin-super.html">Super Admin Dashboard</a></li>
+      <li><a href="admin-records.html">Grave Records</a></li>
+      <li><a href="admin-archived.html">Archived Records</a></li>
+      <li><a href="admin-appointments.html">Appointments</a></li>
+      <li><a href="admin-activity.html">Activity History</a></li>
+      <li><a href="admin-manage.html" class="active">Manage Admins</a></li>
+      <li><a href="admin-settings.html">System Settings</a></li>
+    </ul>
+  </aside>
+
+  <main class="admin-content">
+    <div class="admin-header">
+      <div>
+        <p class="section-tag" style="justify-content:flex-start;">Super Admin Only</p>
+        <h1 class="section-title" style="margin-top:0; margin-bottom:0;">Manage <em>Admins</em></h1>
+      </div>
+      <button class="admin-primary-btn" onclick="openModal('add-admin-modal')">+ Add New Admin</button>
+    </div>
+
+    <div class="admin-table-container">
+      <table class="admin-table" data-admins-table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- Add New Admin Modal -->
+<div id="add-admin-modal" class="modal-overlay" onclick="closeModal(event, 'add-admin-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'add-admin-modal')">✕</button>
+    <p class="section-tag" style="justify-content:flex-start;">Manage Admins</p>
+    <h2 class="section-title" style="margin-top:0; font-size: 2.2rem;">Add <em>Admin</em></h2>
+    <div class="gold-bar"></div>
+
+    <form id="add-admin-form" class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;">
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input" type="email" name="adminEmail" placeholder="e.g. maria.santos@gardenofmemories.com" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input class="field-input" type="password" name="adminPassword" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Role</label>
+        <select class="field-select" name="adminRole" required>
+          <option value="" selected disabled>Select role...</option>
+          <option value="super_admin">Super Admin</option>
+          <option value="mid_admin">Mid Admin</option>
+          <option value="low_admin">Low Admin</option>
+        </select>
+      </div>
+      <button type="submit" class="submit-btn" style="margin-top: 1rem;">Save Admin</button>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Admin Modal -->
+<div id="edit-admin-modal" class="modal-overlay" onclick="closeModal(event, 'edit-admin-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'edit-admin-modal')">✕</button>
+    <p class="section-tag" style="justify-content:flex-start;">Manage Admins</p>
+    <h2 class="section-title" style="margin-top:0; font-size: 2.2rem;">Edit <em>Admin</em></h2>
+    <div class="gold-bar"></div>
+
+    <form id="edit-admin-form" class="contact-form" style="padding:0; border:none; box-shadow:none; background:transparent;">
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input" type="email" name="adminEmail" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input class="field-input" type="password" name="adminPassword" placeholder="Leave blank to keep current password">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Role</label>
+        <select class="field-select" name="adminRole" required>
+          <option value="super_admin">Super Admin</option>
+          <option value="mid_admin">Mid Admin</option>
+          <option value="low_admin">Low Admin</option>
+        </select>
+      </div>
+      <button type="submit" class="submit-btn" style="margin-top: 1rem;">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<!-- System Message Modal -->
+<div id="system-message-modal" class="modal-overlay" onclick="closeModal(event, 'system-message-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()" style="text-align: center; max-width: 450px;">
+    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'system-message-modal')">✕</button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="var(--sage-dark)" stroke-width="2" style="width: 48px; height: 48px; margin-bottom: 1rem; margin-top: 1rem;">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <h2 class="section-title" style="margin-top:0; font-size: 2rem;">Notification</h2>
+    <p class="section-body" id="system-message-text" style="margin-bottom: 1.5rem;"></p>
+    <button class="search-btn" style="margin: 0 auto; display: inline-block; align-self: auto;" onclick="closeModal(event, 'system-message-modal')">Okay</button>
+  </div>
+</div>
+
+<script src="../../visitors panel/visitors javascripts/script.js"></script>
+<script src="../js/admin-auth.js"></script>
+<script src="js/admin-manage.js"></script>
+</body>
+</html>

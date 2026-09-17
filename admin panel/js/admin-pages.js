@@ -109,12 +109,22 @@ function renderAppointments() {
 
   const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments);
   const tbody = table.querySelector('tbody');
+  const canManage = hasPermission('appointments.manage');
 
   tbody.innerHTML = appointments.map(appointment => {
     const statusClass = appointment.status === 'Confirmed' ? 'status-confirmed' : 'status-pending';
-    const confirmButton = appointment.status === 'Pending'
-      ? `<button class="action-btn" type="button" onclick="confirmAppointment(${appointment.id})">Confirm</button>`
-      : '';
+    let actions = '';
+
+    if (canManage) {
+      const confirmButton = appointment.status === 'Pending'
+        ? `<button class="action-btn" type="button" onclick="confirmAppointment(${appointment.id})">Confirm</button>`
+        : '';
+      actions = `
+        ${confirmButton}
+        <button class="action-btn" type="button" onclick="startEditAppointment(${appointment.id})">Edit</button>
+        <button class="action-btn delete" type="button" onclick="cancelAppointment(${appointment.id})">Cancel</button>
+      `;
+    }
 
     return `
       <tr>
@@ -123,11 +133,7 @@ function renderAppointments() {
         <td>${appointment.service}</td>
         <td>${appointment.contact}</td>
         <td><span class="status-badge ${statusClass}">${appointment.status}</span></td>
-        <td>
-          ${confirmButton}
-          <button class="action-btn" type="button" onclick="startEditAppointment(${appointment.id})">Edit</button>
-          <button class="action-btn delete" type="button" onclick="cancelAppointment(${appointment.id})">Cancel</button>
-        </td>
+        <td>${actions}</td>
       </tr>
     `;
   }).join('');
@@ -135,10 +141,14 @@ function renderAppointments() {
 
 // Marks an appointment as confirmed.
 function confirmAppointment(id) {
-  const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments).map(appointment => (
-    appointment.id === id ? { ...appointment, status: 'Confirmed' } : appointment
-  ));
-  saveAdminData(APPOINTMENTS_KEY, appointments);
+  const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments);
+  const appointment = appointments.find(item => item.id === id);
+  if (!appointment) return;
+
+  saveAdminData(APPOINTMENTS_KEY, appointments.map(item => (
+    item.id === id ? { ...item, status: 'Confirmed' } : item
+  )));
+  logActivity('Confirmed', appointment.client, `Appointment #${id} confirmed.`);
   renderAppointments();
   showPageMessage('Appointment confirmed successfully!');
 }
@@ -158,8 +168,12 @@ function startEditAppointment(id) {
 function cancelAppointment(id) {
   if (!confirm('Are you sure you want to cancel this appointment?')) return;
 
-  const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments).filter(appointment => appointment.id !== id);
-  saveAdminData(APPOINTMENTS_KEY, appointments);
+  const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments);
+  const appointment = appointments.find(item => item.id === id);
+  if (!appointment) return;
+
+  saveAdminData(APPOINTMENTS_KEY, appointments.filter(item => item.id !== id));
+  logActivity('Cancelled', appointment.client, `Appointment #${id} cancelled.`);
   renderAppointments();
   showPageMessage('Appointment cancelled successfully!');
 }
@@ -171,23 +185,49 @@ function renderInquiries() {
 
   const inquiries = loadAdminData(INQUIRIES_KEY, defaultInquiries);
   const tbody = table.querySelector('tbody');
+  const canManage = hasPermission('inquiries.manage');
+  const canFlagOnly = hasPermission('inquiries.flagOnly');
 
   tbody.innerHTML = inquiries.map(inquiry => {
     const statusClass = inquiry.status === 'New' ? 'status-new' : 'status-read';
+    const urgentBadge = inquiry.urgent ? '<span class="status-badge status-pending">Urgent</span>' : '';
+
+    let actions = '';
+    if (canManage) {
+      actions = `
+        <button class="action-btn" type="button" onclick="openMessageModal(${inquiry.id})">View & Reply</button>
+        <button class="action-btn delete" type="button" onclick="deleteInquiry(${inquiry.id})">Delete</button>
+      `;
+    } else if (canFlagOnly) {
+      const flagLabel = inquiry.urgent ? 'Unflag' : 'Flag as Urgent';
+      actions = `<button class="action-btn" type="button" onclick="toggleInquiryFlag(${inquiry.id})">${flagLabel}</button>`;
+    }
 
     return `
       <tr>
         <td>${formatDateTime(inquiry.receivedAt)}</td>
         <td>${inquiry.sender}<br><small>${inquiry.email}</small></td>
         <td>${inquiry.subject}</td>
-        <td><span class="status-badge ${statusClass}">${inquiry.status}</span></td>
-        <td>
-          <button class="action-btn" type="button" onclick="openMessageModal(${inquiry.id})">View & Reply</button>
-          <button class="action-btn delete" type="button" onclick="deleteInquiry(${inquiry.id})">Delete</button>
-        </td>
+        <td><span class="status-badge ${statusClass}">${inquiry.status}</span> ${urgentBadge}</td>
+        <td>${actions}</td>
       </tr>
     `;
   }).join('');
+}
+
+// Lets Low Admin flag an inquiry as urgent without replying or deleting it.
+function toggleInquiryFlag(id) {
+  const inquiries = loadAdminData(INQUIRIES_KEY, defaultInquiries);
+  const inquiry = inquiries.find(item => item.id === id);
+  if (!inquiry) return;
+
+  const nextUrgent = !inquiry.urgent;
+  saveAdminData(INQUIRIES_KEY, inquiries.map(item => (
+    item.id === id ? { ...item, urgent: nextUrgent } : item
+  )));
+  logActivity(nextUrgent ? 'Flagged' : 'Unflagged', inquiry.sender, `Message #${id} marked ${nextUrgent ? 'urgent' : 'not urgent'}.`);
+  renderInquiries();
+  showPageMessage(nextUrgent ? 'Message flagged as urgent.' : 'Message unflagged.');
 }
 
 // Opens the message modal and marks a new inquiry as read.
@@ -213,8 +253,12 @@ function openMessageModal(id) {
 function deleteInquiry(id) {
   if (!confirm('Are you sure you want to delete this message?')) return;
 
-  const inquiries = loadAdminData(INQUIRIES_KEY, defaultInquiries).filter(inquiry => inquiry.id !== id);
-  saveAdminData(INQUIRIES_KEY, inquiries);
+  const inquiries = loadAdminData(INQUIRIES_KEY, defaultInquiries);
+  const inquiry = inquiries.find(item => item.id === id);
+  if (!inquiry) return;
+
+  saveAdminData(INQUIRIES_KEY, inquiries.filter(item => item.id !== id));
+  logActivity('Deleted', inquiry.sender, `Message #${id} deleted.`);
   renderInquiries();
   showPageMessage('Message deleted successfully!');
 }
@@ -236,6 +280,7 @@ function setupAdminPageForms() {
       saveAdminData(APPOINTMENTS_KEY, appointments);
       closeModal(event, 'edit-appointment-modal');
       renderAppointments();
+      logActivity('Updated', `Appointment #${editingAppointmentId}`, 'Appointment schedule updated.');
       showPageMessage('Appointment updated successfully!');
     });
   }
@@ -245,6 +290,7 @@ function setupAdminPageForms() {
       event.preventDefault();
       replyForm.reset();
       closeModal(event, 'view-message-modal');
+      logActivity('Replied', `Message #${activeInquiryId}`, 'Reply sent to inquiry.');
       showPageMessage(`Reply sent successfully for message #${activeInquiryId}.`);
     });
   }
