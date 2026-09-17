@@ -96,6 +96,7 @@ function closeModal(event, modalId) {
 function validateSearchForm(event) {
   const firstName = document.querySelector('input[name="firstName"]').value.trim();
   const lastName = document.querySelector('input[name="lastName"]').value.trim();
+  const relationship = document.querySelector('[name="relationship"]').value;
   const nameFields = document.querySelectorAll('.letters-only');
   const deathYearInput = document.querySelector('[name="deathYear"]');
   const deathYear = Number(deathYearInput.value);
@@ -103,7 +104,14 @@ function validateSearchForm(event) {
 
   if (firstName === '' || lastName === '') {
     event.preventDefault();
-    document.getElementById('system-message-text').innerText = 'Please fill in both First Name and Last Name to search. Middle name, year of passing, and relationship are optional.';
+    document.getElementById('system-message-text').innerText = 'Please fill in both First Name and Last Name to search. Middle name and year of passing are optional.';
+    openModal('system-message-modal');
+    return;
+  }
+
+  if (relationship === '') {
+    event.preventDefault();
+    document.getElementById('system-message-text').innerText = 'Please select a relationship to continue.';
     openModal('system-message-modal');
     return;
   }

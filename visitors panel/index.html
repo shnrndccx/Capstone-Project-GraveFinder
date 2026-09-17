@@ -82,9 +82,9 @@
       </select>
     </div>
     <div class="field-group">
-      <label class="field-label field-label-optional">Relationship</label>
-      <select class="field-select" name="relationship" id="relationship-select">
-        <option value="" selected>Select...</option>
+      <label class="field-label field-label-required">Relationship <span aria-hidden="true">*</span></label>
+      <select class="field-select" name="relationship" id="relationship-select" required>
+        <option value="" selected disabled>Select...</option>
         <option>Spouse</option>
         <option>Parent</option>
         <option>Child</option>
