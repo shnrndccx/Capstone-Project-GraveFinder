@@ -31,17 +31,17 @@
     }
   });
 
-  const PH_MOBILE_PATTERN = /^(\+63|0)9\d{9}$/;
-  const ALLOWED_EMAIL_PROVIDERS = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com'];
+  const validation = window.GraveFinderValidation;
 
   // Flags a field red with an inline message, or clears it once the value is valid.
   function setFieldError(input, errorElement, message) {
+    input.setCustomValidity(message || '');
     if (message) {
       input.classList.add('input-invalid');
-      errorElement.innerText = message;
+      if (errorElement) errorElement.innerText = message;
     } else {
       input.classList.remove('input-invalid');
-      errorElement.innerText = '';
+      if (errorElement) errorElement.innerText = '';
     }
   }
 
@@ -86,9 +86,7 @@
         input.value = hasLeadingPlus ? `+${digits}` : digits;
 
         if (errorElement) {
-          const message = input.value && !PH_MOBILE_PATTERN.test(input.value)
-            ? 'Numbers only. Must be a valid mobile number starting with 09 or +63.'
-            : '';
+          const message = validation.contactValidationMessage(input.value);
           setFieldError(input, errorElement, message);
         }
       });
@@ -99,11 +97,7 @@
 
     if (emailInput && emailError) {
       emailInput.addEventListener('input', () => {
-        const value = emailInput.value.trim().toLowerCase();
-        const domain = value.split('@')[1];
-        const message = value && !ALLOWED_EMAIL_PROVIDERS.includes(domain)
-          ? 'Please use an email from a legit provider only (Gmail, Yahoo, Outlook, Hotmail, or iCloud).'
-          : '';
+        const message = validation.emailValidationMessage(emailInput.value, { requireCommonProvider: true });
         setFieldError(emailInput, emailError, message);
       });
     }
@@ -126,6 +120,17 @@
     event.preventDefault();
 
     const form = event.target;
+    const contactInput = form.querySelector('[name="appointmentContact"]');
+    const emailInput = form.querySelector('[name="appointmentEmail"]');
+    const contactError = document.getElementById('appointment-contact-error');
+    const emailError = document.getElementById('appointment-email-error');
+
+    if (contactInput) {
+      setFieldError(contactInput, contactError, validation.contactValidationMessage(contactInput.value));
+    }
+    if (emailInput) {
+      setFieldError(emailInput, emailError, validation.emailValidationMessage(emailInput.value, { requireCommonProvider: true }));
+    }
 
     if (!form.checkValidity()) {
       document.getElementById('system-message-text').innerText = 'Please answer all required fields before submitting.';
@@ -133,21 +138,22 @@
       return;
     }
 
-    const contactInput = form.querySelector('[name="appointmentContact"]');
     const contactValue = contactInput.value.trim();
+    const contactMessage = validation.contactValidationMessage(contactValue);
 
-    if (!PH_MOBILE_PATTERN.test(contactValue)) {
-      document.getElementById('system-message-text').innerText = 'Please enter a valid contact number starting with 09 or +63, followed by 9 more digits (11 digits total for 09 numbers).';
+    if (contactMessage) {
+      setFieldError(contactInput, contactError, contactMessage);
+      document.getElementById('system-message-text').innerText = contactMessage;
       openModal('system-message-modal');
       return;
     }
 
-    const emailInput = form.querySelector('[name="appointmentEmail"]');
     const emailValue = emailInput.value.trim().toLowerCase();
-    const emailDomain = emailValue.split('@')[1];
+    const emailMessage = validation.emailValidationMessage(emailValue, { requireCommonProvider: true });
 
-    if (!ALLOWED_EMAIL_PROVIDERS.includes(emailDomain)) {
-      document.getElementById('system-message-text').innerText = 'Please use an email from a legit provider only, such as Gmail, Yahoo, Outlook, Hotmail, or iCloud.';
+    if (emailMessage) {
+      setFieldError(emailInput, emailError, emailMessage);
+      document.getElementById('system-message-text').innerText = emailMessage;
       openModal('system-message-modal');
       return;
     }

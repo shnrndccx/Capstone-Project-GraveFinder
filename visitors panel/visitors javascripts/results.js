@@ -43,12 +43,19 @@ document.addEventListener('DOMContentLoaded', () => {
     searchName = "Unknown";
   }
 
-  // 2. Display who we are searching for
+  // 2. Show a loading state first so the page doesn't look like it hung
   const queryDisplay = document.getElementById('search-query-display');
-  queryDisplay.replaceChildren(
-    document.createTextNode('Showing results for: '),
-    Object.assign(document.createElement('strong'), { textContent: searchName })
-  );
+  const resultsListEl = document.getElementById('results-list');
+  const privacyPanelEl = document.getElementById('privacy-notice-panel');
+
+  queryDisplay.textContent = 'Searching burial records...';
+  if (privacyPanelEl) privacyPanelEl.style.display = 'none';
+  resultsListEl.innerHTML = `
+    <div class="loading-panel">
+      <div class="loading-spinner" aria-hidden="true"></div>
+      <p>Searching burial records...</p>
+    </div>
+  `;
 
   // 3. Setup dummy data for demonstration
   // (In a real application, you would make an API call to a database here based on 'searchName')
@@ -132,93 +139,139 @@ document.addEventListener('DOMContentLoaded', () => {
     { name: 'Danilo Bautista Cruz', born: 'February 10, 1955', died: 'October 6, 2020', location: 'Section I, Plot 41' }
   ];
 
-  // Filter the data based on search query
-  let filteredData = dummyData;
-  if (firstName || middleName || lastName || deathYear) {
-    filteredData = dummyData.filter(person => {
-      const pName = person.name.toLowerCase();
-      const matchFirst = firstName ? pName.includes(firstName.toLowerCase()) : true;
-      const matchMiddle = middleName ? pName.includes(middleName.toLowerCase()) : true;
-      const matchLast = lastName ? pName.includes(lastName.toLowerCase()) : true;
-      const matchDeathYear = deathYear ? person.died.includes(deathYear) : true;
-      return matchFirst && matchMiddle && matchLast && matchDeathYear;
-    });
-  }
-
-  // 4. Inject the dummy data into the HTML
-  const resultsList = document.getElementById('results-list');
-  const template = document.getElementById('result-card-template');
-  const privacyPanel = document.getElementById('privacy-notice-panel');
-  
-  resultsList.innerHTML = '';
-  if (privacyPanel) {
-    privacyPanel.style.display = 'none';
-  }
-
-  if (filteredData.length === 0) {
-    resultsList.innerHTML = `
-      <section class="no-results-panel">
-        <div class="no-results-illustration" aria-hidden="true">
-          <svg viewBox="0 0 80 80" width="96" height="96" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="34" cy="34" r="18" opacity="0.3" />
-            <path d="M46 46l18 18" />
-            <path d="M25 25h18" />
-            <path d="M25 34h10" />
-            <path d="M25 43h6" />
-          </svg>
-        </div>
-        <div class="no-results-copy">
-          <h2>No matching records found.</h2>
-          <p>It looks like the name might be misspelled, or it may not yet be entered in our system. Please go to our office or <a href="tel:+63286426181">call us</a> for help.</p>
-          <div class="search-tips">
-            <strong>Search tips</strong>
-            <ul>
-              <li>Try alternate spelling or omit common prefixes.</li>
-              <li>Use only the last name for a broader match.</li>
-              <li>Check the spelling of the name before searching again.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-    `;
-  } else {
-    if (privacyPanel) {
-      privacyPanel.style.display = 'flex';
+  const normalizeName = value => String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+  const formatStoredDate = value => {
+    if (!value) return '';
+    const date = new Date(`${value}T00:00:00`);
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  };
+  const storedRecords = (() => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem('graveFinderRecords')) || [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
     }
-    filteredData.forEach(person => {
-      const clone = template.content.cloneNode(true);
-      
-      clone.querySelector('.name').textContent = person.name;
-      clone.querySelector('.details').classList.add('private-detail');
-      clone.querySelector('.born-detail').textContent = `Born: ${person.born}`;
-      clone.querySelector('.died-detail').textContent = `Died: ${person.died}`;
-      clone.querySelector('.location-detail').textContent = `Location: ${person.location}`;
-      clone.querySelector('.locate-btn').addEventListener('click', () => openCemeteryMap(person));
-      resultsList.appendChild(clone);
-    });
-  }
+  })();
+  const archivedNames = new Set(
+    storedRecords
+      .filter(record => record.status === 'archived')
+      .map(record => normalizeName(record.name))
+  );
+  const activeStoredRecords = storedRecords
+    .filter(record => record.status !== 'archived')
+    .map(record => ({
+      name: record.name,
+      born: formatStoredDate(record.birthDate),
+      died: formatStoredDate(record.deathDate),
+      location: record.location
+    }));
+  const seenPublicRecords = new Set();
+  const searchableData = [
+    ...activeStoredRecords,
+    ...dummyData.filter(person => !archivedNames.has(normalizeName(person.name)))
+  ].filter(person => {
+    const key = `${normalizeName(person.name)}|${String(person.location || '').trim().toLowerCase()}`;
+    if (seenPublicRecords.has(key)) return false;
+    seenPublicRecords.add(key);
+    return true;
+  });
 
-  // Timer Notification Countdown
-  let timeLeft = 60;
-  const noticeText = document.getElementById('privacy-notice-text');
-  if (noticeText) {
-    noticeText.innerHTML = `<strong>Privacy Notice:</strong> For the privacy of families, personal details will be blurred after ${timeLeft} seconds.`;
-  }
-  
-  const countdown = setInterval(() => {
-    timeLeft--;
-    if (noticeText && timeLeft > 0) {
-      noticeText.innerHTML = `<strong>Privacy Notice:</strong> For the privacy of families, personal details will be blurred after ${timeLeft} seconds.`;
-    } else if (timeLeft <= 0) {
-      clearInterval(countdown);
-      if (noticeText) noticeText.innerHTML = `<strong>Privacy Notice:</strong> Details are now blurred for family privacy.`;
-    }
-  }, 1000);
-
-  // Timer: Blur the details after 60 seconds (60000 milliseconds)
+  // Simulate the search taking a moment so the loading state is visible
   setTimeout(() => {
-    blurPrivateDetails();
-  }, 60000);
+    // Filter the data based on search query
+    let filteredData = searchableData;
+    if (firstName || middleName || lastName || deathYear) {
+      filteredData = searchableData.filter(person => {
+        const pName = person.name.toLowerCase();
+        const matchFirst = firstName ? pName.includes(firstName.toLowerCase()) : true;
+        const matchMiddle = middleName ? pName.includes(middleName.toLowerCase()) : true;
+        const matchLast = lastName ? pName.includes(lastName.toLowerCase()) : true;
+        const matchDeathYear = deathYear ? person.died.includes(deathYear) : true;
+        return matchFirst && matchMiddle && matchLast && matchDeathYear;
+      });
+    }
+
+    // 4. Inject the dummy data into the HTML
+    queryDisplay.replaceChildren(
+      document.createTextNode('Showing results for: '),
+      Object.assign(document.createElement('strong'), { textContent: searchName })
+    );
+
+    const resultsList = resultsListEl;
+    const template = document.getElementById('result-card-template');
+    const privacyPanel = privacyPanelEl;
+
+    resultsList.innerHTML = '';
+    if (privacyPanel) {
+      privacyPanel.style.display = 'none';
+    }
+
+    if (filteredData.length === 0) {
+      resultsList.innerHTML = `
+        <section class="no-results-panel">
+          <div class="no-results-illustration" aria-hidden="true">
+            <svg viewBox="0 0 80 80" width="96" height="96" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="34" cy="34" r="18" opacity="0.3" />
+              <path d="M46 46l18 18" />
+              <path d="M25 25h18" />
+              <path d="M25 34h10" />
+              <path d="M25 43h6" />
+            </svg>
+          </div>
+          <div class="no-results-copy">
+            <h2>No matching records found.</h2>
+            <p>It looks like the name might be misspelled, or it may not yet be entered in our system. Please go to our office or <a href="tel:+63286426181">call us</a> for help.</p>
+            <div class="search-tips">
+              <strong>Search tips</strong>
+              <ul>
+                <li>Try alternate spelling or omit common prefixes.</li>
+                <li>Use only the last name for a broader match.</li>
+                <li>Check the spelling of the name before searching again.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      `;
+    } else {
+      if (privacyPanel) {
+        privacyPanel.style.display = 'flex';
+      }
+      filteredData.forEach(person => {
+        const clone = template.content.cloneNode(true);
+
+        clone.querySelector('.name').textContent = person.name;
+        clone.querySelector('.details').classList.add('private-detail');
+        clone.querySelector('.born-detail').textContent = `Born: ${person.born}`;
+        clone.querySelector('.died-detail').textContent = `Died: ${person.died}`;
+        clone.querySelector('.location-detail').textContent = `Location: ${person.location}`;
+        clone.querySelector('.locate-btn').addEventListener('click', () => openCemeteryMap(person));
+        resultsList.appendChild(clone);
+      });
+    }
+
+    // Timer Notification Countdown
+    let timeLeft = 60;
+    const noticeText = document.getElementById('privacy-notice-text');
+    if (noticeText) {
+      noticeText.innerHTML = `<strong>Privacy Notice:</strong> For the privacy of families, personal details will be blurred after ${timeLeft} seconds.`;
+    }
+
+    const countdown = setInterval(() => {
+      timeLeft--;
+      if (noticeText && timeLeft > 0) {
+        noticeText.innerHTML = `<strong>Privacy Notice:</strong> For the privacy of families, personal details will be blurred after ${timeLeft} seconds.`;
+      } else if (timeLeft <= 0) {
+        clearInterval(countdown);
+        if (noticeText) noticeText.innerHTML = `<strong>Privacy Notice:</strong> Details are now blurred for family privacy.`;
+      }
+    }, 1000);
+
+    // Timer: Blur the details after 60 seconds (60000 milliseconds)
+    setTimeout(() => {
+      blurPrivateDetails();
+    }, 60000);
+  }, 700);
 
   const mapModal = document.getElementById('map-modal');
   const mapClose = document.getElementById('map-close');

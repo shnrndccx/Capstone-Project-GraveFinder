@@ -10,6 +10,7 @@
         <div class="field-group">
           <label class="field-label field-label-required" for="appointment-name">Full Name <span aria-hidden="true">*</span></label>
           <input class="field-input letters-only" id="appointment-name" name="appointmentName" type="text" required placeholder="e.g. Maria Santos">
+          <small class="field-error-text"></small>
         </div>
         <div class="field-group">
           <label class="field-label field-label-required" for="appointment-contact">Contact Number <span aria-hidden="true">*</span></label>
@@ -25,11 +26,13 @@
           <label class="field-label field-label-required" for="appointment-date">Appointment Date <span aria-hidden="true">*</span></label>
           <input class="field-input" id="appointment-date" name="appointmentDate" type="date" required>
           <small id="appointment-date-help" class="appointment-field-help"></small>
+          <small class="field-error-text"></small>
         </div>
         <div class="field-group">
           <label class="field-label field-label-required" for="appointment-time">Appointment Time <span aria-hidden="true">*</span></label>
           <input class="field-input" id="appointment-time" name="appointmentTime" type="time" min="08:00" max="17:00" required oninput="validateAppointmentTime(this)" onchange="validateAppointmentTime(this)">
           <small class="appointment-field-help">Available from 8:00 AM to 5:00 PM.</small>
+          <small class="field-error-text"></small>
         </div>
       </div>
       <div class="field-group">
@@ -42,10 +45,12 @@
           <option>Document or records inquiry</option>
           <option>Other assistance</option>
         </select>
+        <small class="field-error-text"></small>
       </div>
       <div class="field-group">
         <label class="field-label field-label-required" for="appointment-details">Appointment Details <span aria-hidden="true">*</span></label>
         <textarea class="field-input" id="appointment-details" name="appointmentDetails" required placeholder="Please describe the purpose of the appointment."></textarea>
+        <small class="field-error-text"></small>
       </div>
       <button type="submit" class="staff-contact-button appointment-submit-button">Request Appointment</button>
     </form>

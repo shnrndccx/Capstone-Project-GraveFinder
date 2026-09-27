@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - Garden of Memories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../visitors panel/visitors css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body data-home="admin-dashboard.html" data-login="admin-login.html">
+<nav>
+  <div class="nav-logo" aria-label="Garden of Memories Memorial Park">
+    <img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
+    <div class="nav-brand-text">
+      <span class="brand-main">Garden of Memories Memorial Park</span>
+      <span class="brand-sub">Admin Panel</span>
+    </div>
+  </div>
+  <a href="admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration: none;">Log Out</a>
+</nav>
+
+<div class="admin-wrapper">
+  <aside class="admin-sidebar">
+    <ul class="sidebar-menu">
+      <li><a href="admin-dashboard.html" class="active">Dashboard</a></li>
+      <li data-permission="records.view"><a href="admin-records.html">Burial Records</a></li>
+      <li data-permission="map.manage"><a href="admin-map.html">Cemetery Map</a></li>
+      <li data-permission="appointments.view"><a href="admin-appointments.html">Appointments</a></li>
+      <li data-permission="admins.manage"><a href="admin-manage.html">Manage Admins</a></li>
+      <li data-permission="activity.view"><a href="admin-activity.html">Activity Logs</a></li>
+      <li data-permission="settings.manage"><a href="admin-settings.html">System Settings</a></li>
+    </ul>
+  </aside>
+
+  <main class="admin-content">
+    <div class="admin-header">
+      <div>
+        <p class="section-tag" id="admin-role-label" style="justify-content:flex-start;">Admin</p>
+        <h1 class="section-title" id="admin-welcome-name" style="margin-top:0; margin-bottom:0;">Welcome back!</h1>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <button type="button" class="stat-card stat-card-link" data-permission="records.view" data-dashboard-card="records">
+        <h3>Total Burial Records</h3>
+        <div class="stat-value" data-stat="total-records">0</div>
+      </button>
+      <button type="button" class="stat-card stat-card-link" data-permission="appointments.view" data-dashboard-card="appointments">
+        <h3>Pending Appointments</h3>
+        <div class="stat-value" data-stat="pending-appointments">0</div>
+      </button>
+      <button type="button" class="stat-card stat-card-link" data-permission="admins.manage" data-dashboard-card="admins">
+        <h3>Total Admin Accounts</h3>
+        <div class="stat-value" data-stat="total-admins">0</div>
+      </button>
+      <button type="button" class="stat-card stat-card-link" data-permission="activity.view" data-dashboard-card="activity">
+        <h3>Activity Entries</h3>
+        <div class="stat-value" data-stat="recent-activity">0</div>
+      </button>
+    </div>
+
+    <section class="dashboard-section">
+      <div class="dashboard-section-header">
+        <div>
+          <p class="section-tag" style="justify-content:flex-start;">Analytics</p>
+          <h2>Records & Operations</h2>
+        </div>
+      </div>
+      <div class="analytics-grid">
+        <div class="analytics-card" data-permission="records.view">
+          <div class="analytics-card-header">
+            <h3>Burials Over Time</h3>
+            <span>Monthly records</span>
+          </div>
+          <div class="chart-frame"><canvas id="burials-over-time-chart"></canvas></div>
+          <p class="chart-empty" data-empty-chart="burials-over-time">No record data available yet.</p>
+        </div>
+        <div class="analytics-card" data-permission="records.view">
+          <div class="analytics-card-header">
+            <h3>Records by Section</h3>
+            <span>Cemetery area count</span>
+          </div>
+          <div class="chart-frame"><canvas id="records-by-section-chart"></canvas></div>
+          <p class="chart-empty" data-empty-chart="records-by-section">No section data available yet.</p>
+        </div>
+        <div class="analytics-card" data-permission="appointments.view">
+          <div class="analytics-card-header">
+            <h3>Appointment Status</h3>
+            <span>Current requests</span>
+          </div>
+          <div class="chart-frame chart-frame-small"><canvas id="appointment-status-chart"></canvas></div>
+          <p class="chart-empty" data-empty-chart="appointment-status">No appointment data available yet.</p>
+        </div>
+        <div class="analytics-card" data-permission="records.view">
+          <div class="analytics-card-header">
+            <h3>Archived vs Active</h3>
+            <span>Record availability</span>
+          </div>
+          <div class="chart-frame chart-frame-small"><canvas id="archive-ratio-chart"></canvas></div>
+          <p class="chart-empty" data-empty-chart="archive-ratio">No archive data available yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-section dashboard-two-column">
+      <div class="activity-panel" data-permission="activity.view">
+        <div class="dashboard-section-header compact">
+          <div>
+            <p class="section-tag" style="justify-content:flex-start;">Audit Trail</p>
+            <h2>Recent Activity</h2>
+          </div>
+          <a href="admin-activity.html" class="action-btn" style="text-decoration:none;">View all</a>
+        </div>
+        <ol class="activity-feed" id="dashboard-activity-feed"></ol>
+      </div>
+      <div class="activity-panel">
+        <div class="dashboard-section-header compact">
+          <div>
+            <p class="section-tag" style="justify-content:flex-start;">Reminders</p>
+            <h2>Quick Alerts</h2>
+          </div>
+        </div>
+        <div class="alert-list" id="dashboard-alerts"></div>
+      </div>
+    </section>
+
+    <section class="dashboard-section" data-permission="activity.view">
+      <div class="analytics-card">
+        <div class="analytics-card-header">
+          <h3>Admin Activity Summary</h3>
+          <span>Actions by administrator</span>
+        </div>
+        <div class="chart-frame"><canvas id="admin-activity-chart"></canvas></div>
+        <p class="chart-empty" data-empty-chart="admin-activity">No activity entries available yet.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="dashboard-summary-modal" class="modal-overlay" onclick="closeModal(event, 'dashboard-summary-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width:520px;">
+    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'dashboard-summary-modal')">x</button>
+    <p class="section-tag" id="dashboard-summary-tag" style="justify-content:flex-start;">Dashboard</p>
+    <h2 class="section-title" id="dashboard-summary-title" style="margin-top:0; font-size:2.2rem;"></h2>
+    <div class="gold-bar"></div>
+    <p class="section-body" id="dashboard-summary-body"></p>
+    <a id="dashboard-summary-link" class="admin-primary-btn" style="text-decoration:none; margin-top:1rem;">Open Page</a>
+  </div>
+</div>
+
+<script src="../visitors panel/visitors javascripts/script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/admin-auth.js"></script>
+<script src="js/admin-crud.js"></script>
+<script src="js/admin-pages.js"></script>
+<script src="js/admin-dashboard.js"></script>
+</body>
+</html>

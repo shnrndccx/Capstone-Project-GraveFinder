@@ -62,24 +62,28 @@
   </p>
 
   <!-- Search -->
-  <form action="results.html" method="GET" class="search-box" onsubmit="validateSearchForm(event)">
+  <form action="results.html" method="GET" class="search-box" novalidate onsubmit="validateSearchForm(event)">
     <div class="field-group">
       <label class="field-label field-label-required">First Name <span aria-hidden="true">*</span></label>
-      <input class="field-input letters-only" type="text" name="firstName" placeholder="e.g. Maria" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' -]+" title="Please enter letters only.">
+      <input class="field-input letters-only" type="text" name="firstName" placeholder="e.g. Maria" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' -]+" title="Please enter letters only." required>
+      <small class="field-error-text"></small>
     </div>
     <div class="field-group">
       <label class="field-label field-label-optional">Middle Name</label>
       <input class="field-input letters-only" type="text" name="middleName" placeholder="e.g. Corpuz" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' -]+" title="Please enter letters only.">
+      <small class="field-error-text"></small>
     </div>
     <div class="field-group">
       <label class="field-label field-label-required">Last Name <span aria-hidden="true">*</span></label>
-      <input class="field-input letters-only" type="text" name="lastName" placeholder="e.g. Santos" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' -]+" title="Please enter letters only.">
+      <input class="field-input letters-only" type="text" name="lastName" placeholder="e.g. Santos" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' -]+" title="Please enter letters only." required>
+      <small class="field-error-text"></small>
     </div>
     <div class="field-group">
       <label class="field-label field-label-optional">Death Year</label>
       <select class="field-input" name="deathYear" id="death-year-select">
         <option value="" selected>Select year...</option>
       </select>
+      <small class="field-error-text"></small>
     </div>
     <div class="field-group">
       <label class="field-label field-label-required">Relationship <span aria-hidden="true">*</span></label>
@@ -91,10 +95,12 @@
         <option>Sibling</option>
         <option>Other</option>
       </select>
+      <small class="field-error-text"></small>
     </div>
     <div class="field-group" id="other-relationship-group" style="display: none;">
       <label class="field-label field-label-required">Specify Relationship <span aria-hidden="true">*</span></label>
       <input class="field-input letters-only" type="text" name="otherRelationship" id="otherRelationshipInput" placeholder="e.g. Friend" pattern="[A-Za-zÀ-ÖØ-öø-ÿ' -]+" title="Please enter letters only.">
+      <small class="field-error-text"></small>
     </div>
     <button type="submit" class="search-btn">
       <svg class="search-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -442,7 +448,8 @@
   </div>
 </footer>
 
-<script src="hamburg menu/hmbrg js/hamburger-menu.js"></script>
 <script src="visitors javascripts/script.js"></script>
+<script src="visitors javascripts/form-validation.js"></script>
+<script src="hamburg menu/hmbrg js/hamburger-menu.js"></script>
 </body>
 </html>

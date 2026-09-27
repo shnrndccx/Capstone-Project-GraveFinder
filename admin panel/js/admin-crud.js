@@ -18,6 +18,20 @@ const defaultRecords = [
 ];
 
 let editingRecordId = null;
+let pendingArchiveRecordId = null;
+let pendingRestoreRecordId = null;
+let isSavingRecord = false;
+let toastTimer = null;
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  }[char]));
+}
 
 // Loads records from localStorage, then falls back to the starter records.
 function getRecords() {
@@ -28,7 +42,8 @@ function getRecords() {
   }
 
   try {
-    return JSON.parse(saved);
+    const records = JSON.parse(saved);
+    return Array.isArray(records) ? records : [...defaultRecords];
   } catch {
     saveRecords(defaultRecords);
     return [...defaultRecords];
@@ -60,15 +75,52 @@ function formatDate(value, short = false) {
   });
 }
 
-// Shows a reusable admin notification modal, with alert as backup.
+function formatDateTime(value) {
+  if (!value) return '';
+  return new Date(value).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit'
+  });
+}
+
+function showAdminToast(message) {
+  const toast = document.getElementById('admin-toast');
+  if (!toast) return;
+
+  toast.textContent = message;
+  toast.classList.add('is-visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 3200);
+}
+
+// Retained as a compatibility wrapper for pages that already call this helper.
 function showAdminMessage(message) {
-  const messageText = document.getElementById('system-message-text');
-  if (messageText) {
-    messageText.innerText = message;
-    openModal('system-message-modal');
-  } else {
-    alert(message);
-  }
+  showAdminToast(message);
+}
+
+function setFieldError(input, message) {
+  const errorText = input ? input.parentElement.querySelector('.field-error-text') : null;
+  if (!input) return;
+  input.setCustomValidity(message || '');
+  input.classList.toggle('input-invalid', Boolean(message));
+  if (errorText) errorText.textContent = message || '';
+}
+
+function validateRecordForm(form) {
+  const requiredFields = ['recordName', 'birthDate', 'deathDate', 'location'];
+  let isValid = true;
+
+  requiredFields.forEach(name => {
+    const input = form.querySelector(`[name="${name}"]`);
+    const message = input && input.value.trim() ? '' : 'This field is required.';
+    setFieldError(input, message);
+    if (message) isValid = false;
+  });
+
+  return isValid;
 }
 
 // Collects values from the add/edit record forms.
@@ -81,60 +133,94 @@ function getRecordFormValues(form) {
   };
 }
 
+function recordMatchesSearch(record, searchText) {
+  if (!searchText) return true;
+  const archiveText = [
+    record.archiveReason,
+    record.archivedBy,
+    formatDateTime(record.archivedAt)
+  ].filter(Boolean).join(' ');
+
+  return [
+    record.id,
+    record.name,
+    record.birthDate,
+    record.deathDate,
+    formatDate(record.birthDate),
+    formatDate(record.deathDate),
+    record.location,
+    archiveText
+  ].join(' ').toLowerCase().includes(searchText);
+}
+
+function getSearchValue(tableType) {
+  const id = tableType === 'archived' ? 'archived-record-search-input' : 'record-search-input';
+  const input = document.getElementById(id);
+  return input ? input.value.trim().toLowerCase() : '';
+}
+
+function archiveDetails(record) {
+  return [
+    record.archiveReason ? `Reason: ${escapeHtml(record.archiveReason)}` : 'Reason: Not recorded',
+    record.archivedBy ? `By: ${escapeHtml(record.archivedBy)}` : 'By: Unknown',
+    record.archivedAt ? `At: ${escapeHtml(formatDateTime(record.archivedAt))}` : ''
+  ].filter(Boolean).join('<br>');
+}
+
 // Renders active, recent, or archived records depending on which table is on the page.
 function renderRecords() {
-  const table = document.querySelector('[data-records-table]');
-  if (!table) return;
+  document.querySelectorAll('[data-records-table]').forEach(table => {
+    const tableType = table.dataset.recordsTable;
+    const tbody = table.querySelector('tbody');
+    const canEdit = hasPermission('records.edit');
+    const canArchive = hasPermission('records.archive');
+    const canRestore = hasPermission('records.restore');
+    const searchText = getSearchValue(tableType);
 
-  const tableType = table.dataset.recordsTable;
-  const tbody = table.querySelector('tbody');
-  const canManage = hasPermission('records.add') || hasPermission('records.edit');
-  const canPermanentDelete = hasPermission('records.permanentDelete');
-
-  let visibleRecords;
-  if (tableType === 'recent') {
-    visibleRecords = getActiveRecords().slice(-7).reverse();
-  } else if (tableType === 'archived') {
-    visibleRecords = getArchivedRecords();
-  } else {
-    visibleRecords = getActiveRecords();
-  }
-
-  tbody.innerHTML = visibleRecords.map(record => {
-    const cells = tableType === 'recent'
-      ? `
-        <td>${record.name}</td>
-        <td>${formatDate(record.birthDate)}</td>
-        <td>${formatDate(record.deathDate)}</td>
-        <td>${record.location}</td>
-      `
-      : `
-        <td>#${record.id}</td>
-        <td>${record.name}</td>
-        <td>${formatDate(record.birthDate, true)}</td>
-        <td>${formatDate(record.deathDate, true)}</td>
-        <td>${record.location}</td>
-      `;
-
-    let actions = '';
-    if (tableType === 'archived') {
-      if (canManage) actions += `<button class="action-btn" type="button" onclick="restoreRecord(${record.id})">Restore</button>`;
-      if (canPermanentDelete) actions += `<button class="action-btn delete" type="button" onclick="permanentlyDeleteRecord(${record.id})">Delete Permanently</button>`;
-    } else if (tableType !== 'recent') {
-      if (canManage) {
-        actions += `<button class="action-btn" type="button" onclick="startEditRecord(${record.id})">Edit</button>`;
-        actions += `<button class="action-btn delete" type="button" onclick="archiveRecord(${record.id})">Archive</button>`;
-      }
-      if (canPermanentDelete) actions += `<button class="action-btn delete" type="button" onclick="permanentlyDeleteRecord(${record.id})">Delete</button>`;
+    let visibleRecords;
+    if (tableType === 'recent') {
+      visibleRecords = getActiveRecords().slice(-7).reverse();
+    } else if (tableType === 'archived') {
+      visibleRecords = getArchivedRecords().filter(record => recordMatchesSearch(record, searchText));
+    } else {
+      visibleRecords = getActiveRecords().filter(record => recordMatchesSearch(record, searchText));
     }
 
-    return `
-      <tr data-record-id="${record.id}">
-        ${cells}
-        ${tableType === 'recent' ? '' : `<td>${actions}</td>`}
-      </tr>
-    `;
-  }).join('');
+    tbody.innerHTML = visibleRecords.map(record => {
+      const baseCells = tableType === 'recent'
+        ? `
+          <td>${escapeHtml(record.name)}</td>
+          <td>${escapeHtml(formatDate(record.birthDate))}</td>
+          <td>${escapeHtml(formatDate(record.deathDate))}</td>
+          <td>${escapeHtml(record.location)}</td>
+        `
+        : `
+          <td>#${escapeHtml(record.id)}</td>
+          <td>${escapeHtml(record.name)}</td>
+          <td>${escapeHtml(formatDate(record.birthDate, true))}</td>
+          <td>${escapeHtml(formatDate(record.deathDate, true))}</td>
+          <td>${escapeHtml(record.location)}</td>
+        `;
+
+      let actions = '';
+      if (tableType === 'archived') {
+        if (canRestore) actions += `<button class="action-btn" type="button" onclick="startRestoreRecord(${record.id})">Restore</button>`;
+      } else if (tableType !== 'recent') {
+        if (canEdit) actions += `<button class="action-btn" type="button" onclick="startEditRecord(${record.id})">Edit</button>`;
+        if (canArchive) actions += `<button class="action-btn delete" type="button" onclick="startArchiveRecord(${record.id})">Archive</button>`;
+      }
+
+      const archiveCell = tableType === 'archived' ? `<td>${archiveDetails(record)}</td>` : '';
+
+      return `
+        <tr data-record-id="${record.id}">
+          ${baseCells}
+          ${archiveCell}
+          ${tableType === 'recent' ? '' : `<td>${actions || 'View only'}</td>`}
+        </tr>
+      `;
+    }).join('') || `<tr><td colspan="${tableType === 'archived' ? 7 : 6}">No records found.</td></tr>`;
+  });
 
   const totalValue = document.querySelector('[data-stat="total-records"]');
   if (totalValue) totalValue.textContent = getActiveRecords().length.toLocaleString();
@@ -142,7 +228,8 @@ function renderRecords() {
 
 // Opens the edit modal and fills it with the selected record's data.
 function startEditRecord(id) {
-  const record = getRecords().find(item => item.id === id);
+  if (!hasPermission('records.edit')) return;
+  const record = getRecords().find(item => item.id === id && item.status !== 'archived');
   const form = document.getElementById('edit-record-form');
   if (!record || !form) return;
 
@@ -154,57 +241,97 @@ function startEditRecord(id) {
   openModal('edit-record-modal');
 }
 
-// Archives a record instead of deleting it outright; it stays in the database.
-function archiveRecord(id) {
-  if (!confirm('Are you sure you want to archive this record?')) return;
+function startArchiveRecord(id) {
+  if (!hasPermission('records.archive')) return;
+  const record = getRecords().find(item => item.id === id && item.status !== 'archived');
+  const form = document.getElementById('archive-record-form');
+  if (!record || !form) return;
 
+  pendingArchiveRecordId = id;
+  form.reset();
+  setFieldError(form.querySelector('[name="archiveReason"]'), '');
+  document.getElementById('archive-record-summary').textContent = `Record #${record.id}: ${record.name}`;
+  openModal('archive-record-modal');
+}
+
+// Archives a record instead of deleting it outright; it stays in storage.
+function archiveRecord(id, reason) {
+  if (!hasPermission('records.archive')) return false;
+
+  const currentAdmin = getCurrentAdmin();
   const records = getRecords();
-  const record = records.find(item => item.id === id);
+  const record = records.find(item => item.id === id && item.status !== 'archived');
+  if (!record) return false;
+
+  saveRecords(records.map(item => (item.id === id ? {
+    ...item,
+    status: 'archived',
+    archiveReason: reason.trim(),
+    archivedBy: currentAdmin ? currentAdmin.email : 'Unknown',
+    archivedAt: new Date().toISOString()
+  } : item)));
+
+  logActivity('Archived', record.name, `Record #${id} archived. Reason: ${reason.trim()}`);
+  renderRecords();
+  showAdminToast('Record archived successfully.');
+  return true;
+}
+
+function startRestoreRecord(id) {
+  if (!hasPermission('records.restore')) return;
+  const record = getRecords().find(item => item.id === id && item.status === 'archived');
   if (!record) return;
 
-  saveRecords(records.map(item => (item.id === id ? { ...item, status: 'archived' } : item)));
-  logActivity('Archived', record.name, `Record #${id} moved to Archived Records.`);
-  renderRecords();
-  showAdminMessage('Record archived successfully!');
+  pendingRestoreRecordId = id;
+  document.getElementById('restore-record-summary').textContent = `Restore record #${record.id}: ${record.name}?`;
+  openModal('restore-record-modal');
 }
 
 // Restores an archived record back to the active list.
 function restoreRecord(id) {
+  if (!hasPermission('records.restore')) return false;
   const records = getRecords();
-  const record = records.find(item => item.id === id);
-  if (!record) return;
+  const record = records.find(item => item.id === id && item.status === 'archived');
+  if (!record) return false;
 
-  saveRecords(records.map(item => (item.id === id ? { ...item, status: 'active' } : item)));
+  saveRecords(records.map(item => (item.id === id ? {
+    ...item,
+    status: 'active',
+    restoredBy: getCurrentAdmin() ? getCurrentAdmin().email : 'Unknown',
+    restoredAt: new Date().toISOString()
+  } : item)));
+
   logActivity('Restored', record.name, `Record #${id} restored to Grave Records.`);
   renderRecords();
-  showAdminMessage('Record restored successfully!');
+  showAdminToast('Record restored successfully.');
+  return true;
 }
 
-// Permanently removes a record from the database. Cannot be undone.
-function permanentlyDeleteRecord(id) {
-  if (!hasPermission('records.permanentDelete')) return;
-  if (!confirm('This will permanently delete the record. This action cannot be undone. Continue?')) return;
-
-  const records = getRecords();
-  const record = records.find(item => item.id === id);
-  if (!record) return;
-
-  saveRecords(records.filter(item => item.id !== id));
-  logActivity('Permanently Deleted', record.name, `Record #${id} was permanently removed.`);
-  renderRecords();
-  showAdminMessage('Record permanently deleted.');
+function confirmRestoreRecord() {
+  if (!pendingRestoreRecordId) return;
+  if (restoreRecord(pendingRestoreRecordId)) {
+    pendingRestoreRecordId = null;
+    closeModal(null, 'restore-record-modal');
+  }
 }
 
-// Connects add/edit form submissions to the localStorage CRUD behavior.
+// Connects add/edit/archive form submissions to the localStorage CRUD behavior.
 function setupRecordForms() {
   const addForm = document.getElementById('add-record-form');
   const editForm = document.getElementById('edit-record-form');
+  const archiveForm = document.getElementById('archive-record-form');
 
   if (addForm) {
     addForm.addEventListener('submit', event => {
       event.preventDefault();
       event.stopImmediatePropagation();
+      if (!hasPermission('records.add') || isSavingRecord) return;
+      if (!validateRecordForm(addForm)) {
+        showAdminToast('Please complete all required record fields.');
+        return;
+      }
 
+      isSavingRecord = true;
       const records = getRecords();
       const nextId = records.length ? Math.max(...records.map(record => record.id)) + 1 : 1001;
       const values = getRecordFormValues(addForm);
@@ -214,7 +341,8 @@ function setupRecordForms() {
       closeModal(event, 'add-record-modal');
       renderRecords();
       logActivity('Created', values.name, `New record #${nextId} added.`);
-      showAdminMessage('Record added successfully!');
+      showAdminToast('Record added successfully.');
+      setTimeout(() => { isSavingRecord = false; }, 300);
     }, true);
   }
 
@@ -222,33 +350,82 @@ function setupRecordForms() {
     editForm.addEventListener('submit', event => {
       event.preventDefault();
       event.stopImmediatePropagation();
+      if (!hasPermission('records.edit') || isSavingRecord) return;
+      if (!validateRecordForm(editForm)) {
+        showAdminToast('Please complete all required record fields.');
+        return;
+      }
 
+      isSavingRecord = true;
       const values = getRecordFormValues(editForm);
       const records = getRecords().map(record => (
-        record.id === editingRecordId ? { ...record, ...values } : record
+        record.id === editingRecordId && record.status !== 'archived' ? { ...record, ...values } : record
       ));
       saveRecords(records);
       closeModal(event, 'edit-record-modal');
       renderRecords();
       logActivity('Updated', values.name, `Record #${editingRecordId} details updated.`);
-      showAdminMessage('Record updated successfully!');
+      showAdminToast('Record updated successfully.');
+      setTimeout(() => { isSavingRecord = false; }, 300);
+    }, true);
+  }
+
+  if (archiveForm) {
+    archiveForm.addEventListener('submit', event => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (!hasPermission('records.archive') || isSavingRecord) return;
+
+      const reasonInput = archiveForm.querySelector('[name="archiveReason"]');
+      const reason = reasonInput.value.trim();
+      if (!reason) {
+        setFieldError(reasonInput, 'Archive reason is required.');
+        showAdminToast('Archive reason is required.');
+        return;
+      }
+
+      isSavingRecord = true;
+      if (archiveRecord(pendingArchiveRecordId, reason)) {
+        pendingArchiveRecordId = null;
+        closeModal(event, 'archive-record-modal');
+      }
+      setTimeout(() => { isSavingRecord = false; }, 300);
     }, true);
   }
 }
 
-// Filters the Grave Records table by name, ID, date, or location.
+// Filters the Grave Records table by name, ID, date, reason, administrator, or location.
 function filterRecords() {
   const input = document.getElementById('record-search-input');
-  const rows = document.querySelectorAll('[data-records-table="all"] tbody tr');
-  const searchText = input ? input.value.toLowerCase() : '';
+  if (input && !input.value.trim()) {
+    renderRecords();
+    showAdminToast('Please enter a name, section, plot, date, or ID to filter records.');
+    input.focus();
+    return;
+  }
 
-  rows.forEach(row => {
-    row.style.display = row.textContent.toLowerCase().includes(searchText) ? '' : 'none';
-  });
+  renderRecords();
+}
+
+function filterArchivedRecords() {
+  const input = document.getElementById('archived-record-search-input');
+  if (input && !input.value.trim()) {
+    renderRecords();
+    showAdminToast('Please enter a name, reason, section, plot, date, or ID to filter archived records.');
+    input.focus();
+    return;
+  }
+
+  renderRecords();
 }
 
 // Initializes the admin records UI after the page has loaded.
 document.addEventListener('DOMContentLoaded', () => {
   renderRecords();
   setupRecordForms();
+
+  const activeSearch = document.getElementById('record-search-input');
+  const archivedSearch = document.getElementById('archived-record-search-input');
+  if (activeSearch) activeSearch.addEventListener('input', renderRecords);
+  if (archivedSearch) archivedSearch.addEventListener('input', renderRecords);
 });

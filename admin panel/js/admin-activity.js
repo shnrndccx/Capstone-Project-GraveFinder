@@ -3,11 +3,8 @@ function renderActivityLog() {
   const table = document.querySelector('[data-activity-table]');
   if (!table) return;
 
-  const currentAdmin = getCurrentAdmin();
   const log = getActivityLog();
-  const visibleEntries = hasPermission('activity.viewAll')
-    ? log
-    : log.filter(entry => currentAdmin && entry.adminEmail === currentAdmin.email);
+  const visibleEntries = hasPermission('activity.view') ? log : [];
 
   const tbody = table.querySelector('tbody');
   tbody.innerHTML = visibleEntries.map(entry => `

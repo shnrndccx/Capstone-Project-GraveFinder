@@ -233,6 +233,39 @@
   color: var(--deep);
 }
 
+.loading-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 4rem 1rem;
+  margin-top: 1rem;
+  text-align: center;
+  color: var(--charcoal);
+}
+
+.loading-panel p {
+  margin: 0;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+}
+
+.loading-spinner {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 3px solid rgba(196,166,97,0.25);
+  border-top-color: var(--gold, #c4a661);
+  animation: loading-spin 0.9s linear infinite;
+}
+
+@keyframes loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .no-results-illustration {
   color: rgba(77,131,168,0.85);
 }

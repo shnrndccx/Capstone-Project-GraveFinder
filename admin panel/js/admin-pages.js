@@ -19,6 +19,57 @@ const defaultAppointments = [
     service: 'Chapel Services',
     contact: 'elena@example.com',
     status: 'Confirmed'
+  },
+  {
+    id: 3,
+    dateTime: '2025-09-14T09:00',
+    client: 'Marites Villanueva',
+    service: 'Grave Location Assistance',
+    contact: '+63 918 555 0192',
+    status: 'Completed',
+    archivedAt: '2025-09-14T17:00'
+  },
+  {
+    id: 4,
+    dateTime: '2025-09-20T13:30',
+    client: 'Ramon Dizon',
+    service: 'Document Request',
+    contact: 'ramon.dizon@example.com',
+    status: 'Completed',
+    archivedAt: '2025-09-20T17:15'
+  },
+  {
+    id: 5,
+    dateTime: '2025-09-27T11:00',
+    client: 'Liza Mercado',
+    service: 'Memorial Visit Inquiry',
+    contact: '+63 927 440 1120',
+    status: 'Cancelled',
+    archivedAt: '2025-09-26T15:20'
+  },
+  {
+    id: 6,
+    dateTime: '2026-10-03T09:30',
+    client: 'Angela Santos',
+    service: 'Burial Record Assistance',
+    contact: '+63 917 204 8891',
+    status: 'Pending'
+  },
+  {
+    id: 7,
+    dateTime: '2026-10-05T14:00',
+    client: 'Miguel Reyes',
+    service: 'Grave Location Visit',
+    contact: 'miguel.reyes@example.com',
+    status: 'Confirmed'
+  },
+  {
+    id: 8,
+    dateTime: '2026-10-08T10:30',
+    client: 'Carla Mendoza',
+    service: 'Family Plot Inquiry',
+    contact: '+63 926 118 4402',
+    status: 'Pending'
   }
 ];
 
@@ -58,6 +109,12 @@ const defaultSettings = {
 let editingAppointmentId = null;
 let activeInquiryId = null;
 
+function isAppointmentArchived(appointment) {
+  if (['Completed', 'Archived', 'Done'].includes(appointment.status)) return true;
+  if (!appointment.dateTime) return false;
+  return new Date(appointment.dateTime).getTime() < Date.now();
+}
+
 // Reads an array/object from localStorage, then seeds it with starter data if empty.
 function loadAdminData(key, fallback) {
   const saved = localStorage.getItem(key);
@@ -67,7 +124,17 @@ function loadAdminData(key, fallback) {
   }
 
   try {
-    return JSON.parse(saved);
+    const parsed = JSON.parse(saved);
+    if (key === APPOINTMENTS_KEY && Array.isArray(parsed) && Array.isArray(fallback)) {
+      const savedIds = new Set(parsed.map(item => item.id));
+      const missingFallbackItems = fallback.filter(item => !savedIds.has(item.id));
+      if (missingFallbackItems.length) {
+        const merged = [...parsed, ...missingFallbackItems];
+        localStorage.setItem(key, JSON.stringify(merged));
+        return merged;
+      }
+    }
+    return parsed;
   } catch {
     localStorage.setItem(key, JSON.stringify(fallback));
     return Array.isArray(fallback) ? [...fallback] : { ...fallback };
@@ -107,22 +174,23 @@ function renderAppointments() {
   const table = document.querySelector('[data-appointments-table]');
   if (!table) return;
 
-  const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments);
+  const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments).filter(appointment => !isAppointmentArchived(appointment));
   const tbody = table.querySelector('tbody');
+  const canView = hasPermission('appointments.view');
   const canManage = hasPermission('appointments.manage');
+
+  if (!canView) {
+    tbody.innerHTML = '<tr><td colspan="6">You do not have permission to view appointments.</td></tr>';
+    return;
+  }
 
   tbody.innerHTML = appointments.map(appointment => {
     const statusClass = appointment.status === 'Confirmed' ? 'status-confirmed' : 'status-pending';
     let actions = '';
 
     if (canManage) {
-      const confirmButton = appointment.status === 'Pending'
-        ? `<button class="action-btn" type="button" onclick="confirmAppointment(${appointment.id})">Confirm</button>`
-        : '';
       actions = `
-        ${confirmButton}
         <button class="action-btn" type="button" onclick="startEditAppointment(${appointment.id})">Edit</button>
-        <button class="action-btn delete" type="button" onclick="cancelAppointment(${appointment.id})">Cancel</button>
       `;
     }
 
@@ -133,14 +201,43 @@ function renderAppointments() {
         <td>${appointment.service}</td>
         <td>${appointment.contact}</td>
         <td><span class="status-badge ${statusClass}">${appointment.status}</span></td>
-        <td>${actions}</td>
+        <td>${actions || 'View only'}</td>
       </tr>
     `;
-  }).join('');
+  }).join('') || '<tr><td colspan="6">No active appointments found.</td></tr>';
+}
+
+function renderArchivedAppointments() {
+  const table = document.querySelector('[data-archived-appointments-table]');
+  if (!table) return;
+
+  const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments).filter(isAppointmentArchived);
+  const tbody = table.querySelector('tbody');
+  const canView = hasPermission('appointments.view');
+
+  if (!canView) {
+    tbody.innerHTML = '<tr><td colspan="6">You do not have permission to view archived appointments.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = appointments.map(appointment => {
+    const archivedAt = appointment.archivedAt || appointment.dateTime;
+    return `
+      <tr>
+        <td>${formatDateTime(appointment.dateTime)}</td>
+        <td>${appointment.client}</td>
+        <td>${appointment.service}</td>
+        <td>${appointment.contact}</td>
+        <td><span class="status-badge status-read">${appointment.status || 'Completed'}</span></td>
+        <td>${formatDateTime(archivedAt)}</td>
+      </tr>
+    `;
+  }).join('') || '<tr><td colspan="6">No archived appointments found.</td></tr>';
 }
 
 // Marks an appointment as confirmed.
 function confirmAppointment(id) {
+  if (!hasPermission('appointments.manage')) return;
   const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments);
   const appointment = appointments.find(item => item.id === id);
   if (!appointment) return;
@@ -155,6 +252,7 @@ function confirmAppointment(id) {
 
 // Opens the appointment edit modal with the selected schedule.
 function startEditAppointment(id) {
+  if (!hasPermission('appointments.manage')) return;
   const appointment = loadAdminData(APPOINTMENTS_KEY, defaultAppointments).find(item => item.id === id);
   const form = document.getElementById('edit-appointment-form');
   if (!appointment || !form) return;
@@ -166,6 +264,7 @@ function startEditAppointment(id) {
 
 // Removes a cancelled appointment from the saved list.
 function cancelAppointment(id) {
+  if (!hasPermission('appointments.manage')) return;
   if (!confirm('Are you sure you want to cancel this appointment?')) return;
 
   const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments);
@@ -185,8 +284,13 @@ function renderInquiries() {
 
   const inquiries = loadAdminData(INQUIRIES_KEY, defaultInquiries);
   const tbody = table.querySelector('tbody');
+  const canView = hasPermission('inquiries.view');
   const canManage = hasPermission('inquiries.manage');
-  const canFlagOnly = hasPermission('inquiries.flagOnly');
+
+  if (!canView) {
+    tbody.innerHTML = '<tr><td colspan="5">You do not have permission to view inquiries.</td></tr>';
+    return;
+  }
 
   tbody.innerHTML = inquiries.map(inquiry => {
     const statusClass = inquiry.status === 'New' ? 'status-new' : 'status-read';
@@ -198,9 +302,8 @@ function renderInquiries() {
         <button class="action-btn" type="button" onclick="openMessageModal(${inquiry.id})">View & Reply</button>
         <button class="action-btn delete" type="button" onclick="deleteInquiry(${inquiry.id})">Delete</button>
       `;
-    } else if (canFlagOnly) {
-      const flagLabel = inquiry.urgent ? 'Unflag' : 'Flag as Urgent';
-      actions = `<button class="action-btn" type="button" onclick="toggleInquiryFlag(${inquiry.id})">${flagLabel}</button>`;
+    } else {
+      actions = `<button class="action-btn" type="button" onclick="openMessageModal(${inquiry.id})">View</button>`;
     }
 
     return `
@@ -217,6 +320,7 @@ function renderInquiries() {
 
 // Lets Low Admin flag an inquiry as urgent without replying or deleting it.
 function toggleInquiryFlag(id) {
+  if (!hasPermission('inquiries.manage')) return;
   const inquiries = loadAdminData(INQUIRIES_KEY, defaultInquiries);
   const inquiry = inquiries.find(item => item.id === id);
   if (!inquiry) return;
@@ -242,15 +346,18 @@ function openMessageModal(id) {
   document.getElementById('modal-msg-subject').innerText = inquiry.subject;
   document.getElementById('modal-msg-body').innerText = inquiry.message;
 
-  saveAdminData(INQUIRIES_KEY, inquiries.map(item => (
-    item.id === id ? { ...item, status: 'Read' } : item
-  )));
-  renderInquiries();
+  if (hasPermission('inquiries.manage')) {
+    saveAdminData(INQUIRIES_KEY, inquiries.map(item => (
+      item.id === id ? { ...item, status: 'Read' } : item
+    )));
+    renderInquiries();
+  }
   openModal('view-message-modal');
 }
 
 // Deletes an inquiry from the inbox.
 function deleteInquiry(id) {
+  if (!hasPermission('inquiries.manage')) return;
   if (!confirm('Are you sure you want to delete this message?')) return;
 
   const inquiries = loadAdminData(INQUIRIES_KEY, defaultInquiries);
@@ -273,6 +380,7 @@ function setupAdminPageForms() {
   if (appointmentForm) {
     appointmentForm.addEventListener('submit', event => {
       event.preventDefault();
+      if (!hasPermission('appointments.manage')) return;
       const nextDateTime = appointmentForm.querySelector('[name="dateTime"]').value;
       const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments).map(appointment => (
         appointment.id === editingAppointmentId ? { ...appointment, dateTime: nextDateTime } : appointment
@@ -288,6 +396,7 @@ function setupAdminPageForms() {
   if (replyForm) {
     replyForm.addEventListener('submit', event => {
       event.preventDefault();
+      if (!hasPermission('inquiries.manage')) return;
       replyForm.reset();
       closeModal(event, 'view-message-modal');
       logActivity('Replied', `Message #${activeInquiryId}`, 'Reply sent to inquiry.');
@@ -298,6 +407,7 @@ function setupAdminPageForms() {
   if (parkSettingsForm) {
     parkSettingsForm.addEventListener('submit', event => {
       event.preventDefault();
+      if (!hasPermission('settings.manage')) return;
       const settings = loadAdminData(SETTINGS_KEY, defaultSettings);
       saveAdminData(SETTINGS_KEY, {
         ...settings,
@@ -313,6 +423,7 @@ function setupAdminPageForms() {
   if (accountSettingsForm) {
     accountSettingsForm.addEventListener('submit', event => {
       event.preventDefault();
+      if (!hasPermission('settings.manage')) return;
       const settings = loadAdminData(SETTINGS_KEY, defaultSettings);
       saveAdminData(SETTINGS_KEY, {
         ...settings,
@@ -348,6 +459,7 @@ function loadSettingsForms() {
 // Initializes the page-specific admin behavior for whichever page is open.
 document.addEventListener('DOMContentLoaded', () => {
   renderAppointments();
+  renderArchivedAppointments();
   renderInquiries();
   loadSettingsForms();
   setupAdminPageForms();
