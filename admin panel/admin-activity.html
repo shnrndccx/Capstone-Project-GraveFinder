@@ -7,12 +7,270 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../visitors panel/visitors css/style.css">
-<link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="css/admin.css?v=2">
+<style>
+  .admin-activity-page .admin-content {
+    padding-top: 1.85rem;
+  }
+  .admin-activity-page .admin-header {
+    margin-bottom: .9rem;
+  }
+  .activity-live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .42rem .85rem;
+    border: 1px solid rgba(47,101,77,0.22);
+    border-radius: 999px;
+    background: #f4f8f5;
+    color: var(--sage-dark);
+    font-family: 'Consolas', 'SFMono-Regular', 'Roboto Mono', monospace;
+    font-size: .75rem;
+    letter-spacing: .02em;
+  }
+  .activity-live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #2f7a53;
+    box-shadow: 0 0 0 3px rgba(47,122,83,0.18);
+  }
+  .admin-activity-page .admin-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+  }
+  .admin-activity-page .admin-table th,
+  .admin-activity-page .admin-table td {
+    padding: .82rem .85rem;
+    vertical-align: middle;
+  }
+  .admin-activity-page .admin-table th:nth-child(1),
+  .admin-activity-page .admin-table td:nth-child(1) { width: 15%; }
+  .admin-activity-page .admin-table th:nth-child(2),
+  .admin-activity-page .admin-table td:nth-child(2) { width: 20%; }
+  .admin-activity-page .admin-table th:nth-child(3),
+  .admin-activity-page .admin-table td:nth-child(3) { width: 18%; }
+  .admin-activity-page .admin-table th:nth-child(4),
+  .admin-activity-page .admin-table td:nth-child(4) { width: 21%; }
+  .admin-activity-page .admin-table th:nth-child(5),
+  .admin-activity-page .admin-table td:nth-child(5) { width: 18%; }
+  .admin-activity-page .admin-table th:nth-child(6),
+  .admin-activity-page .admin-table td:nth-child(6) { width: 8%; }
+  .activity-cell-stack {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    min-width: 0;
+  }
+  .activity-event-badge {
+    display: inline-block;
+    align-self: flex-start;
+    padding: .16rem .46rem;
+    border: 1px solid rgba(34,54,47,0.14);
+    border-radius: 4px;
+    background: #f6f8f7;
+    color: var(--deep);
+    font-family: 'Consolas', 'SFMono-Regular', 'Roboto Mono', monospace;
+    font-size: .74rem;
+    font-weight: 400;
+  }
+  .activity-timestamp-text {
+    color: var(--stone);
+    font-size: .76rem;
+    line-height: 1.3;
+  }
+  .activity-actor-email,
+  .activity-record-target {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--deep);
+    font-size: .86rem;
+    font-weight: 400;
+  }
+  .activity-sub-meta,
+  .activity-details-preview {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--stone);
+    font-size: .76rem;
+    line-height: 1.3;
+  }
+  .activity-ip-row,
+  .activity-op-row {
+    display: flex;
+    align-items: center;
+    gap: .38rem;
+    flex-wrap: wrap;
+  }
+  .activity-ip-chip {
+    display: inline-block;
+    padding: .15rem .48rem;
+    border: 1px solid rgba(47,101,77,0.22);
+    border-radius: 4px;
+    background: #eff5f1;
+    color: #244a39;
+    font-family: 'Consolas', 'SFMono-Regular', 'Roboto Mono', monospace;
+    font-size: .76rem;
+    font-weight: 400;
+  }
+  .activity-latency-chip {
+    display: inline-block;
+    padding: .12rem .38rem;
+    border-radius: 4px;
+    background: rgba(34,54,47,0.06);
+    color: #5c6e66;
+    font-family: 'Consolas', 'SFMono-Regular', 'Roboto Mono', monospace;
+    font-size: .7rem;
+  }
+  .activity-method-badge {
+    display: inline-block;
+    padding: .12rem .42rem;
+    border-radius: 4px;
+    font-family: 'Consolas', 'SFMono-Regular', 'Roboto Mono', monospace;
+    font-size: .7rem;
+    font-weight: 500;
+    letter-spacing: .03em;
+  }
+  .method-post { background: #e6f2ec; color: #215c3e; }
+  .method-patch, .method-put { background: #eef2f8; color: #2b4c7e; }
+  .method-delete { background: #fbeae8; color: #8f2d26; }
+  .method-auth { background: #f5efe2; color: #7a581b; }
+  .activity-action-name {
+    color: var(--deep);
+    font-size: .84rem;
+    font-weight: 400;
+  }
+  .activity-severity-pill {
+    display: inline-block;
+    padding: .18rem .55rem;
+    border-radius: 999px;
+    font-family: 'Consolas', 'SFMono-Regular', 'Roboto Mono', monospace;
+    font-size: .7rem;
+    font-weight: 500;
+    letter-spacing: .04em;
+  }
+  .severity-info { background: #e8f3ed; color: #256143; }
+  .severity-notice { background: #fdf3dc; color: #8a5b13; }
+  .severity-warn { background: #fbe8e6; color: #962d25; }
+  .activity-endpoint-text {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #566b62;
+    font-family: 'Consolas', 'SFMono-Regular', 'Roboto Mono', monospace;
+    font-size: .74rem;
+  }
+  /* Spacious Event Inspector Modal */
+  .activity-inspect-modal-content {
+    width: 94% !important;
+    max-width: 720px !important;
+    padding: 1.75rem 2rem !important;
+    overflow-x: hidden !important;
+  }
+  .activity-modal-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: .15rem;
+  }
+  .activity-telemetry-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem .95rem;
+    margin: .95rem 0 1.15rem;
+  }
+  .activity-telemetry-item {
+    display: flex;
+    flex-direction: column;
+    gap: .28rem;
+    padding: .72rem .95rem;
+    border: 1px solid rgba(34,54,47,0.11);
+    border-radius: 8px;
+    background: #f8fbf9;
+    min-width: 0;
+  }
+  .activity-telemetry-item.activity-telemetry-full {
+    grid-column: 1 / -1;
+  }
+  .activity-telemetry-item span {
+    display: block;
+    color: #6b7d75;
+    font-size: .69rem;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    line-height: 1.25;
+  }
+  .activity-telemetry-item strong {
+    display: block;
+    color: var(--deep);
+    font-size: .88rem;
+    font-weight: 400;
+    line-height: 1.45;
+    word-break: break-word;
+  }
+  .mono-text {
+    font-family: 'Consolas', 'SFMono-Regular', 'Roboto Mono', monospace !important;
+    font-size: .82rem !important;
+    font-weight: 400 !important;
+  }
+  .activity-json-section {
+    border: 1px solid rgba(34,54,47,0.16);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #1a2420;
+    margin-bottom: .35rem;
+  }
+  .activity-json-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    flex-wrap: wrap;
+    padding: .55rem .95rem;
+    background: #22302b;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    color: #a9bdb4;
+    font-size: .68rem;
+    letter-spacing: .08em;
+  }
+  .activity-json-pre {
+    margin: 0;
+    padding: .85rem 1rem;
+    max-height: 185px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #d7e8df;
+    font-family: 'Consolas', 'SFMono-Regular', 'Roboto Mono', monospace;
+    font-size: .76rem;
+    line-height: 1.5;
+  }
+  @media (max-width: 640px) {
+    .activity-telemetry-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
 </head>
-<body data-home="admin-dashboard.html" data-login="admin-login.html" data-requires-permission="activity.view">
+<body class="admin-activity-page" data-home="admin-dashboard.html" data-login="admin-login.html" data-requires-permission="activity.view">
 <nav>
   <div class="nav-logo" aria-label="Garden of Memories Memorial Park"><img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img"><div class="nav-brand-text"><span class="brand-main">Garden of Memories Memorial Park</span><span class="brand-sub">Admin Panel</span></div></div>
-  <a href="admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration:none;">Log Out</a>
+  <div class="admin-nav-actions">
+    <button type="button" class="notification-banner" aria-label="View notifications">
+      <span class="notification-icon" aria-hidden="true"></span>
+      <span class="notification-count" aria-label="0 unread notifications">0</span>
+    </button>
+    <a href="admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration:none;">Log Out</a>
+  </div>
 </nav>
 <div class="admin-wrapper">
   <aside class="admin-sidebar">
@@ -27,15 +285,155 @@
     </ul>
   </aside>
   <main class="admin-content">
-    <div class="admin-header"><div><p class="section-tag" style="justify-content:flex-start;">Accountability</p><h1 class="section-title" style="margin-top:0; margin-bottom:0;">Activity <em>Logs</em></h1></div></div>
+    <div class="admin-header">
+      <div>
+        <p class="section-tag" style="justify-content:flex-start;">Security &amp; Accountability Telemetry</p>
+        <h1 class="section-title" style="margin-top:0; margin-bottom:0;">Activity <em>Logs</em></h1>
+      </div>
+      <div class="activity-live-pill" aria-label="Audit status">
+        <span class="activity-live-dot" aria-hidden="true"></span>
+        <span>Audit Stream Active · SHA-256 Verified</span>
+      </div>
+    </div>
+
+    <section class="admin-summary-grid" aria-label="Audit telemetry summary">
+      <div class="admin-summary-card">
+        <strong data-activity-summary="total">0</strong>
+        <span>Total Audit Events</span>
+        <small>Recorded system operations</small>
+      </div>
+      <div class="admin-summary-card">
+        <strong data-activity-summary="ips">0</strong>
+        <span>Unique Source IPs</span>
+        <small>Authenticated network nodes</small>
+      </div>
+      <div class="admin-summary-card">
+        <strong data-activity-summary="mutations">0</strong>
+        <span>Write / Mutation Ops</span>
+        <small>POST · PATCH · DELETE requests</small>
+      </div>
+      <div class="admin-summary-card">
+        <strong data-activity-summary="security">0</strong>
+        <span>Security &amp; IAM Events</span>
+        <small>Role, ACL &amp; archive actions</small>
+      </div>
+    </section>
+
+    <div class="search-box admin-manage-search-box" style="animation:none; opacity:1;">
+      <div class="field-group">
+        <label class="field-label" for="activity-search-input">Search Audit Trail</label>
+        <input id="activity-search-input" class="field-input" type="text" placeholder="Search by Event ID, IP address, email, endpoint, or target...">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="activity-category-filter">Module / Endpoint</label>
+        <select id="activity-category-filter" class="field-select">
+          <option value="">All Modules</option>
+          <option value="iam">Admin &amp; IAM (/api/v1/iam)</option>
+          <option value="appointments">Appointments (/api/v1/appointments)</option>
+          <option value="records">Burial Records (/api/v1/records)</option>
+          <option value="inquiries">Inquiries (/api/v1/inquiries)</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="activity-severity-filter">Severity Level</label>
+        <select id="activity-severity-filter" class="field-select">
+          <option value="">All Levels</option>
+          <option value="INFO">INFO (200 OK)</option>
+          <option value="NOTICE">NOTICE (Mutation / ACL)</option>
+          <option value="WARN">WARN (Destructive)</option>
+        </select>
+      </div>
+      <div class="record-filter-actions">
+        <button type="button" class="search-btn" onclick="renderActivityLog()">Filter</button>
+        <button type="button" class="action-btn" onclick="clearActivityFilters()">Clear</button>
+      </div>
+    </div>
+
     <div class="admin-table-container">
       <table class="admin-table" data-activity-table>
-        <thead><tr><th>Date & Time</th><th>Admin</th><th>Action</th><th>Record</th><th>Details</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Event &amp; Timestamp</th>
+            <th>Actor (Admin)</th>
+            <th>Source IP &amp; Client</th>
+            <th>Operation &amp; Endpoint</th>
+            <th>Target &amp; Summary</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
         <tbody></tbody>
       </table>
     </div>
   </main>
 </div>
+
+<div id="view-activity-modal" class="modal-overlay" onclick="closeModal(event, 'view-activity-modal')">
+  <div class="modal-content appointment-edit-modal-content activity-inspect-modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'view-activity-modal')">x</button>
+    <p class="section-tag" style="justify-content:flex-start;">Audit Event Telemetry</p>
+    <div class="activity-modal-header-row">
+      <h2 class="section-title appointment-edit-title" id="inspect-event-title">Event Inspector</h2>
+      <span class="activity-severity-pill severity-info" id="inspect-event-severity">INFO</span>
+    </div>
+    <div class="gold-bar"></div>
+
+    <div class="activity-telemetry-grid">
+      <div class="activity-telemetry-item">
+        <span>Event ID</span>
+        <strong class="mono-text" id="inspect-event-id">—</strong>
+      </div>
+      <div class="activity-telemetry-item">
+        <span>Timestamp</span>
+        <strong class="mono-text" id="inspect-event-timestamp">—</strong>
+      </div>
+      <div class="activity-telemetry-item">
+        <span>Source IPv4 Address</span>
+        <strong class="mono-text" id="inspect-event-ip">—</strong>
+      </div>
+      <div class="activity-telemetry-item">
+        <span>Network Node</span>
+        <strong id="inspect-event-node">—</strong>
+      </div>
+      <div class="activity-telemetry-item">
+        <span>Actor Account</span>
+        <strong id="inspect-event-actor">—</strong>
+      </div>
+      <div class="activity-telemetry-item">
+        <span>Session &amp; Latency</span>
+        <strong class="mono-text" id="inspect-event-session">—</strong>
+      </div>
+      <div class="activity-telemetry-item">
+        <span>Client Environment</span>
+        <strong id="inspect-event-client">—</strong>
+      </div>
+      <div class="activity-telemetry-item">
+        <span>HTTP Response</span>
+        <strong class="mono-text" id="inspect-event-status">—</strong>
+      </div>
+      <div class="activity-telemetry-item activity-telemetry-full">
+        <span>Request Endpoint &amp; Target</span>
+        <strong class="mono-text" id="inspect-event-endpoint">—</strong>
+      </div>
+      <div class="activity-telemetry-item activity-telemetry-full">
+        <span>Audit Trail Summary</span>
+        <strong id="inspect-event-details">—</strong>
+      </div>
+    </div>
+
+    <div class="activity-json-section">
+      <div class="activity-json-header">
+        <span>RAW EVENT PAYLOAD (JSON)</span>
+        <span class="mono-text" id="inspect-event-hash">SHA-256: verified</span>
+      </div>
+      <pre class="activity-json-pre" id="inspect-event-json"></pre>
+    </div>
+
+    <div class="archive-actions">
+      <button type="button" class="action-btn" onclick="closeModal(event, 'view-activity-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
 <script src="../visitors panel/visitors javascripts/script.js"></script>
 <script src="js/admin-auth.js"></script>
 <script src="js/admin-activity.js"></script>

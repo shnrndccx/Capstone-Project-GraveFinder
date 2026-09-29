@@ -179,6 +179,24 @@
       return;
     }
 
+    const appointmentsKey = 'graveFinderAppointments';
+    const savedAppointments = JSON.parse(localStorage.getItem(appointmentsKey) || '[]');
+    const nextId = savedAppointments.length ? Math.max(...savedAppointments.map(appointment => Number(appointment.id) || 0)) + 1 : 1;
+    const appointmentType = form.querySelector('[name="appointmentType"]').value;
+    const appointmentDetails = form.querySelector('[name="appointmentDetails"]').value.trim();
+    const appointment = {
+      id: nextId,
+      dateTime: `${dateInput.value}T${timeInput.value}`,
+      client: form.querySelector('[name="appointmentName"]').value.trim(),
+      service: appointmentType,
+      contact: [contactValue, emailValue].filter(Boolean).join(' / '),
+      contactNumber: contactValue,
+      email: emailValue,
+      details: appointmentDetails,
+      status: 'Pending'
+    };
+
+    localStorage.setItem(appointmentsKey, JSON.stringify([...savedAppointments, appointment]));
     document.getElementById('system-message-text').innerText = 'Your appointment request has been submitted. Please wait for a staff member to contact you through your email or phone number, so please check them regularly.';
     closeModal(event, 'appointment-modal');
     openModal('system-message-modal');

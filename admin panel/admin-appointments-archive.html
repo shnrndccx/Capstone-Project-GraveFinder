@@ -15,7 +15,13 @@
     <img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img">
     <div class="nav-brand-text"><span class="brand-main">Garden of Memories Memorial Park</span><span class="brand-sub">Admin Panel</span></div>
   </div>
-  <a href="admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration:none;">Log Out</a>
+  <div class="admin-nav-actions">
+    <button type="button" class="notification-banner" aria-label="View notifications">
+      <span class="notification-icon" aria-hidden="true"></span>
+      <span class="notification-count" aria-label="0 unread notifications">0</span>
+    </button>
+    <a href="admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration:none;">Log Out</a>
+  </div>
 </nav>
 <div class="admin-wrapper">
   <aside class="admin-sidebar">
@@ -41,13 +47,40 @@
         <h3>Finished Appointments</h3>
         <div class="admin-table-container">
           <table class="admin-table" data-archived-appointments-table>
-            <thead><tr><th>Date & Time</th><th>Client Name</th><th>Service Interest</th><th>Contact Info</th><th>Status</th><th>Archived / Finished</th></tr></thead>
+            <thead><tr><th>Date & Time</th><th>Client Name</th><th>Service Interest</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
       </div>
     </div>
   </main>
+</div>
+<div id="view-archived-appointment-modal" class="modal-overlay" onclick="closeModal(event, 'view-archived-appointment-modal')">
+  <div class="modal-content appointment-edit-modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" aria-label="Close Modal" onclick="closeModal(event, 'view-archived-appointment-modal')">x</button>
+    <p class="section-tag" style="justify-content:flex-start;">Scheduling Archive</p>
+    <h2 class="section-title appointment-edit-title">Appointment details</h2>
+    <form id="view-archived-appointment-form" class="contact-form" novalidate style="padding:0; border:none; box-shadow:none; background:transparent;">
+      <div class="appointment-edit-grid">
+        <div class="field-group appointment-edit-full"><label class="field-label">Full Name</label><input class="field-input" type="text" name="client" readonly></div>
+        <div class="field-group"><label class="field-label">Contact Number</label><input class="field-input" type="text" name="contactNumber" readonly></div>
+        <div class="field-group"><label class="field-label">Email</label><input class="field-input" type="email" name="email" readonly></div>
+        <div class="field-group"><label class="field-label">Appointment Date</label><input class="field-input" type="date" name="appointmentDate" readonly></div>
+        <div class="field-group"><label class="field-label">Appointment Time</label><input class="field-input" type="time" name="appointmentTime" readonly></div>
+        <div class="field-group appointment-edit-full"><label class="field-label">Appointment For</label><input class="field-input" type="text" name="service" readonly></div>
+        <div class="field-group appointment-edit-full"><label class="field-label">Appointment Details</label><textarea class="field-input" name="details" readonly placeholder="No additional details provided"></textarea></div>
+        <div class="field-group"><label class="field-label">Schedule Confirmation</label><input class="field-input" type="text" name="scheduleConfirmation" readonly></div>
+        <div class="field-group"><label class="field-label">Email Notification</label><input class="field-input" type="text" name="emailStatus" readonly></div>
+        <div class="field-group"><label class="field-label">Status</label><input class="field-input" type="text" name="status" readonly></div>
+        <div class="field-group"><label class="field-label">Archived / Finished</label><input class="field-input" type="text" name="archivedAt" readonly></div>
+        <div class="field-group appointment-edit-full"><label class="field-label">Appointment Outcome</label><input class="field-input" type="text" name="appointmentOutcome" readonly></div>
+        <div class="field-group"><label class="field-label">Handled / Assisted By</label><input class="field-input" type="text" name="handledBy" readonly></div>
+        <div class="field-group"><label class="field-label">Follow-up Needed</label><input class="field-input" type="text" name="followUpNeeded" readonly></div>
+        <div class="field-group appointment-edit-full"><label class="field-label">Admin / Session Notes</label><textarea class="field-input" name="archiveNotes" readonly placeholder="No archive notes recorded"></textarea></div>
+      </div>
+      <button type="button" class="submit-btn" onclick="closeModal(event, 'view-archived-appointment-modal')">Close</button>
+    </form>
+  </div>
 </div>
 <script src="../visitors panel/visitors javascripts/script.js"></script>
 <script src="js/admin-auth.js"></script>

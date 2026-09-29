@@ -63,8 +63,13 @@
     }
 
     setCurrentAdmin(result.admin);
+    logActivity(
+      'Admin Login',
+      result.admin.fullName || result.admin.email,
+      `${ROLE_LABELS[result.admin.role] || 'Admin'} session authenticated.`
+    );
 
-    window.location.href = 'admin-dashboard.html';
+    window.location.href = getAdminHome();
   });
 </script>
 </body>

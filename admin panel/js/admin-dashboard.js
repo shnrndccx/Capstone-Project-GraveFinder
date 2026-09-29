@@ -1,12 +1,25 @@
 function adminDisplayName(admin) {
   if (!admin) return 'Admin';
   if (admin.fullName) return admin.fullName;
+  if (admin.name) return admin.name;
   return admin.email ? admin.email.split('@')[0].replace(/[._-]+/g, ' ') : 'Admin';
 }
 
 function countPendingAppointments() {
   const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments);
   return appointments.filter(appointment => appointment.status === 'Pending' && !isAppointmentArchived(appointment)).length;
+}
+
+function countConfirmedAppointments() {
+  const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments);
+  return appointments.filter(appointment => appointment.status === 'Confirmed' && !isAppointmentArchived(appointment)).length;
+}
+
+function getGrantedPermissionGroups(admin) {
+  if (!admin) return [];
+  if (admin.role === 'super_admin') return [...CUSTOMIZABLE_PERMISSIONS];
+  const effectiveSet = new Set(getEffectiveAdminPermissions(admin));
+  return CUSTOMIZABLE_PERMISSIONS.filter(group => group.keys.every(key => effectiveSet.has(key)));
 }
 
 function dashboardDateLabel(value) {
@@ -33,7 +46,7 @@ function relativeTime(value) {
 }
 
 function recordMonthKey(record) {
-  const sourceDate = record.createdAt || record.deathDate || record.birthDate;
+  const sourceDate = record.createdAt || record.deceasedDate || record.deathDate || record.birthDate;
   if (!sourceDate) return 'Unknown';
   const date = new Date(`${sourceDate}`.includes('T') ? sourceDate : `${sourceDate}T00:00:00`);
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -46,6 +59,11 @@ function extractSection(location) {
   if (sectionMatch) return `Section ${sectionMatch[1].toUpperCase()}`;
   if (gardenMatch) return `Garden of ${gardenMatch[1].trim().split(',')[0]}`;
   return text.split(',')[0].trim() || 'Unspecified';
+}
+
+function recordSectionLabel(record) {
+  if (record.section) return `Section ${String(record.section).toUpperCase()}`;
+  return extractSection(record.location);
 }
 
 function countBy(items, keyGetter) {
@@ -121,7 +139,7 @@ function renderBurialsChart(records) {
 }
 
 function renderSectionChart(records) {
-  const counts = countBy(records, record => extractSection(record.location));
+  const counts = countBy(records, recordSectionLabel);
   const labels = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).slice(0, 8);
   renderChart('records-by-section-chart', 'records-by-section', {
     type: 'bar',
@@ -237,6 +255,29 @@ function renderDashboardAlerts() {
   `).join('') || '<div class="alert-item"><strong>No urgent alerts</strong><span>Nothing needs attention right now.</span></div>';
 }
 
+function renderAssignedPermissionsPanel(currentAdmin) {
+  const panel = document.getElementById('dashboard-permissions-panel');
+  const listEl = document.getElementById('dashboard-permissions-list');
+  if (!panel || !listEl || !currentAdmin) return;
+
+  if (hasPermission('activity.view')) {
+    panel.hidden = true;
+    return;
+  }
+
+  panel.hidden = false;
+  const groups = getGrantedPermissionGroups(currentAdmin);
+  listEl.innerHTML = groups.map(group => `
+    <div class="alert-item" style="display:flex; align-items:center; justify-content:space-between; gap:.75rem;">
+      <div>
+        <strong>${group.label}</strong>
+        <span>${group.desc}</span>
+      </div>
+      ${group.page && group.page !== 'admin-dashboard.html' ? `<a href="${group.page}" class="action-btn" style="text-decoration:none; flex-shrink:0;">Open</a>` : ''}
+    </div>
+  `).join('') || '<div class="alert-item"><strong>Dashboard Access</strong><span>Standard dashboard access is enabled.</span></div>';
+}
+
 function openDashboardSummary(title, tag, body, linkHref, linkLabel = 'Open Page') {
   const titleEl = document.getElementById('dashboard-summary-title');
   const tagEl = document.getElementById('dashboard-summary-tag');
@@ -248,8 +289,15 @@ function openDashboardSummary(title, tag, body, linkHref, linkLabel = 'Open Page
   titleEl.textContent = title;
   tagEl.textContent = tag;
   bodyEl.innerHTML = body;
-  linkEl.href = linkHref;
-  linkEl.textContent = linkLabel;
+  if (linkHref) {
+    linkEl.href = linkHref;
+    linkEl.textContent = linkLabel;
+    linkEl.hidden = false;
+    linkEl.style.display = 'inline-flex';
+  } else {
+    linkEl.hidden = true;
+    linkEl.style.display = 'none';
+  }
   openModal('dashboard-summary-modal');
 }
 
@@ -257,6 +305,7 @@ function setupDashboardCards() {
   document.querySelectorAll('[data-dashboard-card]').forEach(card => {
     card.addEventListener('click', () => {
       const type = card.dataset.dashboardCard;
+      const currentAdmin = getCurrentAdmin();
       const records = getRecords();
       const appointments = loadAdminData(APPOINTMENTS_KEY, defaultAppointments);
       const activeRecords = records.filter(record => record.status !== 'archived').length;
@@ -300,11 +349,11 @@ function setupDashboardCards() {
         return;
       }
 
-      if (type === 'appointments') {
-        const pending = appointments.filter(item => item.status === 'Pending').length;
-        const confirmed = appointments.filter(item => item.status === 'Confirmed').length;
+      if (type === 'appointments' || type === 'confirmed-appointments') {
+        const pending = appointments.filter(item => item.status === 'Pending' && !isAppointmentArchived(item)).length;
+        const confirmed = appointments.filter(item => item.status === 'Confirmed' && !isAppointmentArchived(item)).length;
         openDashboardSummary(
-          'Pending Appointments',
+          type === 'confirmed-appointments' ? 'Confirmed Appointments' : 'Pending Appointments',
           'Scheduling',
           `<strong>${pending}</strong> pending appointment${pending === 1 ? '' : 's'} need review.<br><strong>${confirmed}</strong> confirmed appointment${confirmed === 1 ? '' : 's'} are currently listed.`,
           'admin-appointments.html',
@@ -313,6 +362,17 @@ function setupDashboardCards() {
         return;
       }
 
+      if (type === 'permissions') {
+        const groups = getGrantedPermissionGroups(currentAdmin);
+        const roleLabel = currentAdmin ? (ROLE_LABELS[currentAdmin.role] || currentAdmin.role) : 'Admin';
+        openDashboardSummary(
+          'Active Access Powers',
+          roleLabel,
+          `Your account (<strong>${adminDisplayName(currentAdmin)}</strong>) has <strong>${groups.length}</strong> active permission group${groups.length === 1 ? '' : 's'}:<br>${groups.map(g => `• ${g.label}`).join('<br>')}`,
+          '',
+          ''
+        );
+      }
     });
   });
 }
@@ -345,6 +405,20 @@ function renderUnifiedDashboard() {
     recentActivity.textContent = getActivityLog().length.toLocaleString();
   }
 
+  const confirmedApptsCard = document.getElementById('dashboard-card-confirmed-appts');
+  if (confirmedApptsCard && !hasPermission('admins.manage') && hasPermission('appointments.view')) {
+    confirmedApptsCard.hidden = false;
+    const statEl = confirmedApptsCard.querySelector('[data-stat="confirmed-appointments"]');
+    if (statEl) statEl.textContent = countConfirmedAppointments().toLocaleString();
+  }
+
+  const permissionsCard = document.getElementById('dashboard-card-permissions');
+  if (permissionsCard && !hasPermission('activity.view')) {
+    permissionsCard.hidden = false;
+    const statEl = permissionsCard.querySelector('[data-stat="active-permissions"]');
+    if (statEl) statEl.textContent = getGrantedPermissionGroups(currentAdmin).length.toLocaleString();
+  }
+
   renderBurialsChart(records);
   renderSectionChart(records);
   renderAppointmentChart();
@@ -352,6 +426,7 @@ function renderUnifiedDashboard() {
   renderAdminActivityChart();
   renderRecentActivityFeed();
   renderDashboardAlerts();
+  renderAssignedPermissionsPanel(currentAdmin);
   setupDashboardCards();
 }
 

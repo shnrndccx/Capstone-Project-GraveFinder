@@ -7,12 +7,264 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../visitors panel/visitors css/style.css">
-<link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="css/admin.css?v=2">
+<style>
+  .admin-settings-page .admin-content {
+    padding-top: 1.85rem;
+  }
+  .admin-settings-page .settings-header {
+    margin-bottom: 1.1rem;
+  }
+  .admin-settings-page .settings-header .section-body {
+    margin: .35rem 0 0;
+    color: var(--stone);
+    font-size: .9rem;
+  }
+  .admin-settings-page .settings-shell {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 1.15rem;
+    align-items: start;
+  }
+  .admin-settings-page .settings-nav {
+    background: var(--ivory);
+    border: 1px solid rgba(34,54,47,0.12);
+    border-radius: 10px;
+    box-shadow: 0 10px 22px rgba(34,54,47,0.035);
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+    padding: .55rem;
+    position: sticky;
+    top: 1rem;
+  }
+  .admin-settings-page .settings-nav-item {
+    background: transparent;
+    border: 0;
+    border-left: 3px solid transparent;
+    border-radius: 6px;
+    color: var(--deep);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: .88rem;
+    font-weight: 400;
+    letter-spacing: .01em;
+    padding: .68rem .85rem;
+    text-align: left;
+    transition: background .18s ease, border-color .18s ease, color .18s ease;
+  }
+  .admin-settings-page .settings-nav-item:hover,
+  .admin-settings-page .settings-nav-item.active {
+    background: rgba(47,101,77,0.09);
+    border-left-color: var(--admin-btn-bg);
+    color: var(--admin-btn-bg);
+  }
+  .admin-settings-page .settings-card {
+    background: var(--ivory);
+    padding: 1.65rem 1.85rem;
+    border: 1px solid rgba(34,54,47,0.12);
+    border-radius: 10px;
+    box-shadow: 0 10px 24px rgba(34,54,47,0.04);
+  }
+  .admin-settings-page .settings-card h3 {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: var(--deep);
+    margin: 0 0 .25rem;
+    padding: 0;
+    border: 0;
+  }
+  .admin-settings-page .settings-card-note {
+    color: var(--stone);
+    font-size: .86rem;
+    margin: 0 0 1.15rem;
+    padding-bottom: .85rem;
+    border-bottom: 1px solid rgba(34,54,47,0.1);
+  }
+  .admin-settings-page .settings-form.contact-form {
+    gap: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .admin-settings-page .settings-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .85rem 1rem;
+  }
+  .admin-settings-page .settings-form .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: .32rem;
+    margin: 0;
+  }
+  .admin-settings-page .settings-form .field-label {
+    font-size: .73rem;
+    font-weight: 500;
+    letter-spacing: .08em;
+    color: #52665d;
+  }
+  .admin-settings-page .settings-form .field-input,
+  .admin-settings-page .settings-form .field-select {
+    min-height: 41px;
+    padding: .52rem .82rem;
+    border: 1px solid rgba(34,54,47,0.15);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--deep);
+    font-size: .88rem;
+  }
+  .admin-settings-page .settings-form textarea.field-input {
+    min-height: 76px;
+    resize: vertical;
+  }
+  .admin-settings-page .settings-form .field-error-text:empty {
+    display: none;
+  }
+  .admin-settings-page .settings-check-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: .5rem;
+  }
+  .admin-settings-page .settings-check-grid label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    min-height: 40px;
+    padding: .45rem .55rem;
+    border: 1px solid rgba(34,54,47,0.14);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--deep);
+    font-size: .84rem;
+    font-weight: 400;
+    cursor: pointer;
+  }
+  .admin-settings-page .settings-check-grid input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--admin-btn-bg);
+    margin: 0;
+  }
+  .admin-settings-page .settings-toggles-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .75rem;
+  }
+  .admin-settings-page .settings-toggle {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    align-items: start;
+    column-gap: .6rem;
+    row-gap: .15rem;
+    min-height: 0;
+    padding: .72rem .9rem;
+    border: 1px solid rgba(34,54,47,0.13);
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: border-color .18s ease, background .18s ease;
+  }
+  .admin-settings-page .settings-toggle:hover {
+    border-color: var(--admin-btn-bg);
+    background: #fcfdfc;
+  }
+  .admin-settings-page .settings-toggle input[type="checkbox"] {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 16px;
+    height: 16px;
+    margin: .16rem 0 0;
+    accent-color: var(--admin-btn-bg);
+    cursor: pointer;
+  }
+  .admin-settings-page .settings-toggle span {
+    grid-column: 2;
+    color: var(--deep);
+    font-size: .86rem;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+  .admin-settings-page .settings-toggle small {
+    grid-column: 2;
+    color: var(--stone);
+    font-size: .77rem;
+    line-height: 1.35;
+  }
+  .admin-settings-page .settings-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem;
+  }
+  .admin-settings-page .settings-status-card {
+    background: #f8fbf9;
+    border: 1px solid rgba(34,54,47,0.12);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+    justify-content: center;
+    min-height: 76px;
+    padding: .75rem .95rem;
+  }
+  .admin-settings-page .settings-status-card span {
+    color: #6b7d75;
+    font-size: .7rem;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .admin-settings-page .settings-status-card strong {
+    color: var(--deep);
+    font-family: var(--font-body);
+    font-size: .94rem;
+    font-weight: 500;
+  }
+  .admin-settings-page .settings-status-card small {
+    color: var(--stone);
+    font-size: .76rem;
+    line-height: 1.35;
+  }
+  .admin-settings-page .settings-button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+    margin: .95rem 0 0;
+  }
+  .admin-settings-page .settings-form .submit-btn {
+    align-self: flex-start;
+    min-height: 40px;
+    margin-top: 1.1rem;
+    padding: .55rem 1.35rem;
+  }
+  @media (max-width: 900px) {
+    .admin-settings-page .settings-shell {
+      grid-template-columns: 1fr;
+    }
+    .admin-settings-page .settings-toggles-row,
+    .admin-settings-page .settings-list {
+      grid-template-columns: 1fr;
+    }
+    .admin-settings-page .settings-check-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>
 </head>
-<body data-home="admin-dashboard.html" data-login="admin-login.html" data-requires-permission="settings.manage">
+<body class="admin-settings-page" data-home="admin-dashboard.html" data-login="admin-login.html" data-requires-permission="settings.manage">
 <nav>
   <div class="nav-logo" aria-label="Garden of Memories Memorial Park"><img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img"><div class="nav-brand-text"><span class="brand-main">Garden of Memories Memorial Park</span><span class="brand-sub">Admin Panel</span></div></div>
-  <a href="admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration:none;">Log Out</a>
+  <div class="admin-nav-actions">
+    <button type="button" class="notification-banner" aria-label="View notifications">
+      <span class="notification-icon" aria-hidden="true"></span>
+      <span class="notification-count" aria-label="0 unread notifications">0</span>
+    </button>
+    <a href="admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration:none;">Log Out</a>
+  </div>
 </nav>
 <div class="admin-wrapper">
   <aside class="admin-sidebar">
@@ -27,28 +279,150 @@
     </ul>
   </aside>
   <main class="admin-content">
-    <div class="admin-header"><div><p class="section-tag" style="justify-content:flex-start;">Configuration</p><h1 class="section-title" style="margin-top:0; margin-bottom:0;">System <em>Settings</em></h1></div></div>
-    <div class="settings-grid">
-      <div class="settings-card">
-        <h3>Park Details</h3>
-        <form id="park-settings-form" class="contact-form" novalidate style="padding:0; border:none; box-shadow:none; background:transparent;">
-          <div class="field-group"><label class="field-label">Park Name</label><input class="field-input" type="text" name="parkName" required><small class="field-error-text"></small></div>
-          <div class="field-group"><label class="field-label">Park Hours</label><input class="field-input" type="text" name="parkHours" required><small class="field-error-text"></small></div>
-          <div class="field-group"><label class="field-label">Office Hours</label><input class="field-input" type="text" name="officeHours" required><small class="field-error-text"></small></div>
-          <div class="field-group"><label class="field-label">Public Contact Email</label><input class="field-input" type="email" name="publicEmail" required><small class="field-error-text"></small></div>
-          <button type="submit" class="submit-btn">Save Park Details</button>
-        </form>
-      </div>
-      <div class="settings-card">
-        <h3>Admin Login</h3>
-        <form id="account-settings-form" class="contact-form" novalidate style="padding:0; border:none; box-shadow:none; background:transparent;">
-          <div class="field-group"><label class="field-label">Admin Name</label><input class="field-input" type="text" name="adminName" required><small class="field-error-text"></small></div>
-          <div class="field-group"><label class="field-label">Admin Login Email</label><input class="field-input" type="email" name="adminEmail" required><small class="field-error-text"></small></div>
-          <div class="field-group"><label class="field-label">New Password</label><input class="field-input" type="password" name="adminPassword" placeholder="Leave blank to keep current password"><small class="field-error-text"></small></div>
-          <button type="submit" class="submit-btn">Update Credentials</button>
-        </form>
+    <div class="admin-header settings-header">
+      <div>
+        <p class="section-tag" style="justify-content:flex-start;">Configuration</p>
+        <h1 class="section-title" style="margin-top:0; margin-bottom:0;">System <em>Settings</em></h1>
+        <p class="section-body">Manage park information, administrator preferences, and system configurations.</p>
       </div>
     </div>
+
+    <section class="settings-shell" aria-label="System settings categories">
+      <aside class="settings-nav" aria-label="Settings navigation">
+        <button type="button" class="settings-nav-item active" data-settings-target="park-settings-panel">Park Information</button>
+        <button type="button" class="settings-nav-item" data-settings-target="appointment-settings-panel">Appointment Settings</button>
+        <button type="button" class="settings-nav-item" data-settings-target="map-settings-panel">Cemetery Map</button>
+        <button type="button" class="settings-nav-item" data-settings-target="notification-settings-panel">Notifications</button>
+        <button type="button" class="settings-nav-item" data-settings-target="security-settings-panel">Security &amp; Access</button>
+        <button type="button" class="settings-nav-item" data-settings-target="data-settings-panel">Data Management</button>
+        <button type="button" class="settings-nav-item" data-settings-target="preference-settings-panel">System Preferences</button>
+      </aside>
+
+      <div class="settings-panels">
+        <section class="settings-card settings-panel active" id="park-settings-panel">
+          <h3>Park Information</h3>
+          <p class="settings-card-note">Park details, address, contact information, and operating status.</p>
+          <form id="park-settings-form" class="contact-form settings-form" novalidate>
+            <div class="settings-form-grid">
+              <div class="field-group"><label class="field-label">Park Name</label><input class="field-input" type="text" name="parkName" required><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Park Status</label><select class="field-select" name="parkStatus"><option>Open</option><option>Limited Operations</option><option>Temporarily Closed</option></select><small class="field-error-text"></small></div>
+              <div class="field-group settings-wide"><label class="field-label">Park Address</label><input class="field-input" type="text" name="parkAddress" placeholder="Complete cemetery address"><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Park Hours</label><input class="field-input" type="text" name="parkHours" required><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Office Hours</label><input class="field-input" type="text" name="officeHours" required><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Contact Number</label><input class="field-input" type="tel" name="contactNumber"><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Public Contact Email</label><input class="field-input" type="email" name="publicEmail" required><small class="field-error-text"></small></div>
+              <div class="field-group settings-wide"><label class="field-label">Park Logo</label><input class="field-input" type="text" name="parkLogo" placeholder="../assets/logo.png"><small class="field-error-text"></small></div>
+              <div class="field-group settings-wide"><label class="field-label">Park Description</label><textarea class="field-input" name="parkDescription" rows="3"></textarea><small class="field-error-text"></small></div>
+            </div>
+            <button type="submit" class="submit-btn">Save Park Information</button>
+          </form>
+        </section>
+
+        <section class="settings-card settings-panel" id="appointment-settings-panel">
+          <h3>Appointment Settings</h3>
+          <p class="settings-card-note">Configure appointment availability and booking restrictions.</p>
+          <form id="appointment-settings-form" class="contact-form settings-form" novalidate>
+            <div class="settings-form-grid">
+              <div class="field-group"><label class="field-label">Appointment Start Time</label><input class="field-input" type="time" name="appointmentStartTime"><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Appointment End Time</label><input class="field-input" type="time" name="appointmentEndTime"><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Maximum Appointments Per Day</label><input class="field-input" type="number" name="maxAppointmentsPerDay" min="1"><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Booking Lead Time (Days)</label><input class="field-input" type="number" name="bookingLeadTime" min="0"><small class="field-error-text"></small></div>
+              <div class="field-group settings-wide"><label class="field-label">Available Days</label><div class="settings-check-grid"><label><input type="checkbox" name="availableDays" value="Mon"> Mon</label><label><input type="checkbox" name="availableDays" value="Tue"> Tue</label><label><input type="checkbox" name="availableDays" value="Wed"> Wed</label><label><input type="checkbox" name="availableDays" value="Thu"> Thu</label><label><input type="checkbox" name="availableDays" value="Fri"> Fri</label><label><input type="checkbox" name="availableDays" value="Sat"> Sat</label><label><input type="checkbox" name="availableDays" value="Sun"> Sun</label></div></div>
+              <div class="settings-toggles-row">
+                <label class="settings-toggle"><input type="checkbox" name="allowRescheduling"><span>Allow appointment rescheduling</span></label>
+                <label class="settings-toggle"><input type="checkbox" name="allowCancellation"><span>Allow appointment cancellation</span></label>
+                <label class="settings-toggle"><input type="checkbox" name="autoBlockFullDates"><span>Auto-block fully booked dates</span></label>
+              </div>
+              <div class="field-group settings-wide"><label class="field-label">Holiday and Special Closures</label><textarea class="field-input" name="specialClosures" rows="3" placeholder="Example: 2026-12-25 - Christmas Day"></textarea><small class="field-error-text"></small></div>
+            </div>
+            <button type="submit" class="submit-btn">Save Appointment Settings</button>
+          </form>
+        </section>
+
+        <section class="settings-card settings-panel" id="map-settings-panel">
+          <h3>Cemetery Map Settings</h3>
+          <p class="settings-card-note">Control map display preferences without duplicating grave location editing.</p>
+          <form id="map-settings-form" class="contact-form settings-form" novalidate>
+            <div class="settings-form-grid">
+              <div class="field-group"><label class="field-label">Default Map View</label><input class="field-input" type="text" name="defaultMapView"><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Default Zoom Level</label><input class="field-input" type="number" name="defaultZoomLevel" min="1" max="20"><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Visitor Map Access</label><select class="field-select" name="visitorMapAccess"><option>Enabled</option><option>Disabled</option></select><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Map Last Updated</label><input class="field-input" type="date" name="mapLastUpdated"><small class="field-error-text"></small></div>
+              <div class="settings-toggles-row">
+                <label class="settings-toggle"><input type="checkbox" name="showLocationLabels"><span>Show Location Labels</span></label>
+                <label class="settings-toggle"><input type="checkbox" name="showGraveMarkers"><span>Show Grave Markers</span></label>
+                <label class="settings-toggle"><input type="checkbox" name="showMapLegend"><span>Show Map Legend</span></label>
+              </div>
+              <div class="field-group settings-wide"><label class="field-label">Unavailable Areas</label><textarea class="field-input" name="unavailableAreas" rows="3"></textarea><small class="field-error-text"></small></div>
+            </div>
+            <button type="submit" class="submit-btn">Save Map Settings</button>
+          </form>
+        </section>
+
+        <section class="settings-card settings-panel" id="notification-settings-panel">
+          <h3>Notification Settings</h3>
+          <p class="settings-card-note">Configure system alerts for appointments, account updates, and archives.</p>
+          <form id="notification-settings-form" class="contact-form settings-form" novalidate>
+            <div class="settings-list">
+              <label class="settings-toggle"><input type="checkbox" name="notifyNewAppointment"><span>New Appointment</span><small>Notify staff when a visitor schedules an appointment.</small></label>
+              <label class="settings-toggle"><input type="checkbox" name="notifyAppointmentCancellation"><span>Appointment Cancellation</span><small>Notify staff when an appointment is cancelled.</small></label>
+              <label class="settings-toggle"><input type="checkbox" name="notifyAppointmentReminder"><span>Appointment Reminder</span><small>Send reminders before scheduled appointments.</small></label>
+              <label class="settings-toggle"><input type="checkbox" name="notifyAdminChanges"><span>Admin Account Changes</span><small>Notify the Super Admin about account changes.</small></label>
+              <label class="settings-toggle settings-wide"><input type="checkbox" name="notifyRecordArchiving"><span>Record Archiving</span><small>Notify authorized administrators when a burial record is archived.</small></label>
+            </div>
+            <button type="submit" class="submit-btn">Save Notification Settings</button>
+          </form>
+        </section>
+
+        <section class="settings-card settings-panel" id="security-settings-panel">
+          <h3>Security &amp; Access</h3>
+          <p class="settings-card-note">Update only the currently signed-in administrator profile and password.</p>
+          <form id="account-settings-form" class="contact-form settings-form" novalidate>
+            <div class="settings-form-grid">
+              <div class="field-group"><label class="field-label">Admin Name</label><input class="field-input" type="text" name="adminName" required><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Login Email</label><input class="field-input" type="email" name="adminEmail" required><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Current Password</label><input class="field-input" type="password" name="currentPassword" placeholder="Required when changing password"><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">New Password</label><input class="field-input" type="password" name="adminPassword" placeholder="Leave blank to keep current password"><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Confirm Password</label><input class="field-input" type="password" name="confirmPassword"><small class="field-error-text"></small></div>
+              <div class="settings-status-card"><span>Active Sessions</span><strong>1 current session</strong><small>Session tools can be connected when server authentication is added.</small></div>
+            </div>
+            <button type="submit" class="submit-btn">Update Security Settings</button>
+          </form>
+        </section>
+
+        <section class="settings-card settings-panel" id="data-settings-panel">
+          <h3>Data Management</h3>
+          <p class="settings-card-note">Manage backups and archive retention while preserving historical burial records.</p>
+          <form id="data-settings-form" class="contact-form settings-form" novalidate>
+            <div class="settings-form-grid">
+              <div class="settings-status-card"><span>Database Backup</span><strong>Configured</strong><small>Last successful backup: September 28, 2026 - 11:30 PM</small></div>
+              <div class="field-group"><label class="field-label">Automatic Backup Frequency</label><select class="field-select" name="backupFrequency"><option>Daily</option><option>Weekly</option><option>Monthly</option></select><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Archive Retention</label><select class="field-select" name="archiveRetention"><option>Preserve indefinitely</option><option>Review yearly</option><option>Review every 5 years</option></select><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Activity Log Retention</label><select class="field-select" name="activityLogRetention"><option>1 year</option><option>3 years</option><option>5 years</option><option>Preserve indefinitely</option></select><small class="field-error-text"></small></div>
+            </div>
+            <div class="settings-button-row"><button type="button" class="action-btn" onclick="showPageMessage('Backup creation is ready for server integration.')">Create Backup</button><button type="button" class="action-btn" onclick="showPageMessage('Backup history is ready for server integration.')">View Backup History</button></div>
+            <button type="submit" class="submit-btn">Save Data Settings</button>
+          </form>
+        </section>
+
+        <section class="settings-card settings-panel" id="preference-settings-panel">
+          <h3>System Preferences</h3>
+          <p class="settings-card-note">Set display formats, sessions, and maintenance behavior.</p>
+          <form id="preference-settings-form" class="contact-form settings-form" novalidate>
+            <div class="settings-form-grid">
+              <div class="field-group"><label class="field-label">Timezone</label><select class="field-select" name="timezone"><option>Asia/Manila</option><option>UTC</option></select><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Date Format</label><select class="field-select" name="dateFormat"><option>MM/DD/YYYY</option><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Time Format</label><select class="field-select" name="timeFormat"><option>12-hour</option><option>24-hour</option></select><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Language</label><select class="field-select" name="language"><option>English</option><option>Filipino</option></select><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Records per Page</label><select class="field-select" name="recordsPerPage"><option>10</option><option>20</option><option>50</option></select><small class="field-error-text"></small></div>
+              <div class="field-group"><label class="field-label">Session Timeout</label><select class="field-select" name="sessionTimeout"><option>15 minutes</option><option>30 minutes</option><option>1 hour</option><option>2 hours</option></select><small class="field-error-text"></small></div>
+              <label class="settings-toggle settings-wide"><input type="checkbox" name="maintenanceMode"><span>Maintenance Mode</span><small>Temporarily display a maintenance notice on the public visitor portal while updates are applied.</small></label>
+            </div>
+            <button type="submit" class="submit-btn">Save System Preferences</button>
+          </form>
+        </section>
+      </div>
+    </section>
   </main>
 </div>
 <div id="system-message-modal" class="modal-overlay" onclick="closeModal(event, 'system-message-modal')">

@@ -12,7 +12,13 @@
 <body data-home="admin-dashboard.html" data-login="admin-login.html" data-requires-permission="map.manage">
 <nav>
   <div class="nav-logo" aria-label="Garden of Memories Memorial Park"><img src="../assets/logo.png" alt="Garden of Memories Logo" class="nav-brand-img"><div class="nav-brand-text"><span class="brand-main">Garden of Memories Memorial Park</span><span class="brand-sub">Admin Panel</span></div></div>
-  <a href="admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration:none;">Log Out</a>
+  <div class="admin-nav-actions">
+    <button type="button" class="notification-banner" aria-label="View notifications">
+      <span class="notification-icon" aria-hidden="true"></span>
+      <span class="notification-count" aria-label="0 unread notifications">0</span>
+    </button>
+    <a href="admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration:none;">Log Out</a>
+  </div>
 </nav>
 <div class="admin-wrapper">
   <aside class="admin-sidebar">

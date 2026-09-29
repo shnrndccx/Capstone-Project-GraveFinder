@@ -8,12 +8,14 @@
   const BLOCKED_EMAIL_NAMES = ['test', 'sample', 'example', 'fake', 'dummy', 'none', 'na'];
 
   function isPhoneField(field) {
+    if (field.tagName !== 'INPUT' || field.readOnly) return false;
     const label = labelTextFor(field).toLowerCase();
     const name = `${field.name || ''} ${field.id || ''}`.toLowerCase();
     return field.inputMode === 'tel' || field.type === 'tel' || field.classList.contains('numbers-only') || /contact|phone|mobile/.test(`${label} ${name}`);
   }
 
   function isEmailField(field) {
+    if (field.tagName !== 'INPUT' || field.readOnly) return false;
     return field.type === 'email' || /email/i.test(`${field.name || ''} ${field.id || ''} ${labelTextFor(field)}`);
   }
 

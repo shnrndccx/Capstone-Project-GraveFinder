@@ -18,7 +18,13 @@
       <span class="brand-sub">Admin Panel</span>
     </div>
   </div>
-  <a href="admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration: none;">Log Out</a>
+  <div class="admin-nav-actions">
+    <button type="button" class="notification-banner" aria-label="View notifications">
+      <span class="notification-icon" aria-hidden="true"></span>
+      <span class="notification-count" aria-label="0 unread notifications">0</span>
+    </button>
+    <a href="admin-login.html" id="admin-logout-link" class="nav-cta" style="text-decoration: none;">Log Out</a>
+  </div>
 </nav>
 
 <div class="admin-wrapper">
@@ -42,7 +48,7 @@
       </div>
     </div>
 
-    <div class="stat-grid">
+    <div class="stat-grid" id="dashboard-stat-grid">
       <button type="button" class="stat-card stat-card-link" data-permission="records.view" data-dashboard-card="records">
         <h3>Total Burial Records</h3>
         <div class="stat-value" data-stat="total-records">0</div>
@@ -59,9 +65,17 @@
         <h3>Activity Entries</h3>
         <div class="stat-value" data-stat="recent-activity">0</div>
       </button>
+      <button type="button" class="stat-card stat-card-link" id="dashboard-card-confirmed-appts" data-permission="appointments.view" data-dashboard-card="confirmed-appointments" hidden>
+        <h3>Confirmed Appointments</h3>
+        <div class="stat-value" data-stat="confirmed-appointments">0</div>
+      </button>
+      <button type="button" class="stat-card stat-card-link" id="dashboard-card-permissions" data-dashboard-card="permissions" hidden>
+        <h3>Active Access Powers</h3>
+        <div class="stat-value" data-stat="active-permissions">0</div>
+      </button>
     </div>
 
-    <section class="dashboard-section">
+    <section class="dashboard-section" data-section-permission="dashboard">
       <div class="dashboard-section-header">
         <div>
           <p class="section-tag" style="justify-content:flex-start;">Analytics</p>
@@ -123,6 +137,15 @@
           </div>
         </div>
         <div class="alert-list" id="dashboard-alerts"></div>
+      </div>
+      <div class="activity-panel" id="dashboard-permissions-panel" hidden>
+        <div class="dashboard-section-header compact">
+          <div>
+            <p class="section-tag" style="justify-content:flex-start;">Role &amp; Capabilities</p>
+            <h2>Assigned Access Powers</h2>
+          </div>
+        </div>
+        <div id="dashboard-permissions-list" class="alert-list"></div>
       </div>
     </section>
 
