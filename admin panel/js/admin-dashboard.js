@@ -383,9 +383,11 @@ function renderUnifiedDashboard() {
   const welcome = document.getElementById('admin-welcome-name');
   const role = document.getElementById('admin-role-label');
   const records = getRecords();
+  const statGrid = document.getElementById('dashboard-stat-grid');
 
-  if (welcome) welcome.textContent = `Welcome back, ${adminDisplayName(currentAdmin)}!`;
+  if (welcome) welcome.textContent = 'Welcome GMMPCI';
   if (role) role.textContent = roleLabel;
+  if (statGrid) statGrid.hidden = true;
 
   document.querySelectorAll('[data-stat="total-records"]').forEach(item => {
     item.textContent = getActiveRecords().length.toLocaleString();
@@ -406,15 +408,15 @@ function renderUnifiedDashboard() {
   }
 
   const confirmedApptsCard = document.getElementById('dashboard-card-confirmed-appts');
-  if (confirmedApptsCard && !hasPermission('admins.manage') && hasPermission('appointments.view')) {
-    confirmedApptsCard.hidden = false;
+  if (confirmedApptsCard) {
+    confirmedApptsCard.hidden = true;
     const statEl = confirmedApptsCard.querySelector('[data-stat="confirmed-appointments"]');
     if (statEl) statEl.textContent = countConfirmedAppointments().toLocaleString();
   }
 
   const permissionsCard = document.getElementById('dashboard-card-permissions');
-  if (permissionsCard && !hasPermission('activity.view')) {
-    permissionsCard.hidden = false;
+  if (permissionsCard) {
+    permissionsCard.hidden = true;
     const statEl = permissionsCard.querySelector('[data-stat="active-permissions"]');
     if (statEl) statEl.textContent = getGrantedPermissionGroups(currentAdmin).length.toLocaleString();
   }
@@ -427,7 +429,6 @@ function renderUnifiedDashboard() {
   renderRecentActivityFeed();
   renderDashboardAlerts();
   renderAssignedPermissionsPanel(currentAdmin);
-  setupDashboardCards();
 }
 
 document.addEventListener('DOMContentLoaded', renderUnifiedDashboard);
